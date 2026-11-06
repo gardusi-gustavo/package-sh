@@ -2,13 +2,16 @@
 # Publish the version in VERSION as a Git tag.
 set -euo pipefail
 
-ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+ROOT="$PWD"
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --root) ROOT="$2"; shift 2 ;;
+    -h|--help) echo "usage: release.sh [--root PATH]"; exit 0 ;;
+    *) echo "error: unknown argument: $1" >&2; exit 2 ;;
+  esac
+done
 cd "$ROOT"
-
-[[ $# -eq 0 ]] || {
-  echo "error: release reads VERSION; bump it in a reviewed PR first" >&2
-  exit 2
-}
 [[ -s VERSION ]] || { echo "error: missing VERSION" >&2; exit 2; }
 
 version="$(tr -d '[:space:]' < VERSION)"
@@ -42,8 +45,8 @@ git rev-parse --verify "$tag" >/dev/null 2>&1 && {
   exit 1
 }
 
-bash "$ROOT/infra/scripts/check-version.sh" --root "$ROOT" --version "$version"
-bash "$ROOT/infra/scripts/ci/validate-publish-targets.sh" --root "$ROOT"
+bash "$SCRIPT_DIR/check-version.sh" --root "$ROOT" --version "$version"
+bash "$SCRIPT_DIR/ci/validate-publish-targets.sh" --root "$ROOT"
 
 git tag "$tag"
 git push origin "$tag"

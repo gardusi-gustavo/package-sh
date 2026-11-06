@@ -2,6 +2,7 @@
 # Validate a repository against its infra/config/repo.json contract.
 set -euo pipefail
 
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT="."
 while [[ $# -gt 0 ]]; do
   case "$1" in
@@ -23,11 +24,11 @@ pages="$(jq -r '.features.pages // false' "$CONFIG")"
 [[ "$visibility" == "public" || "$visibility" == "private" ]] || fail "visibility must be public or private"
 [[ "$(jq -r '.schema' "$CONFIG")" == "1" ]] || fail "unsupported schema"
 
-if ! infra/scripts/ci/validate-repo-contract.sh --config "$CONFIG"; then
+if ! "$SCRIPT_DIR/validate-repo-contract.sh" --config "$CONFIG"; then
   errors=$((errors + 1))
 fi
 
-if ! infra/scripts/ci/validate-publish-targets.sh --root .; then
+if ! "$SCRIPT_DIR/validate-publish-targets.sh" --root .; then
   errors=$((errors + 1))
 fi
 
@@ -80,7 +81,7 @@ if [[ -n "$knowledge_mode" ]]; then
   fi
 fi
 
-for f in README.md .gitattributes .gitignore .dockerignore "$CONFIG" infra/docker/ci.dockerfile infra/scripts/ci.sh infra/scripts/ci/validate-files.sh docs/README.md; do
+for f in README.md .gitattributes .gitignore "$CONFIG" docs/README.md; do
   [[ -s "$f" ]] || fail "missing required file: $f"
 done
 
@@ -115,7 +116,7 @@ while IFS= read -r f; do
   case "$f" in *.md) ;; *) fail "docs/ must contain only Markdown: $f" ;; esac
 done < <(git ls-files 'docs/**' || true)
 
-infra/scripts/ci/validate-files.sh --root . --config "$CONFIG"
+"$SCRIPT_DIR/validate-files.sh" --root . --config "$CONFIG"
 
 max_repo="$(jq -r '.limits.repo_mb // 100' "$CONFIG")"
 max_file="$(jq -r '.limits.file_mb // 25' "$CONFIG")"
@@ -132,7 +133,7 @@ lines="$(wc -l < README.md)"
 (( lines <= readme_max )) || fail "README.md is ${lines} lines; max ${readme_max}"
 
 (( errors == 0 )) || exit 1
-if [[ -x infra/scripts/check-layout.sh ]]; then
-  infra/scripts/check-layout.sh --root .
+if [[ -x "$SCRIPT_DIR/../check-layout.sh" ]]; then
+  "$SCRIPT_DIR/../check-layout.sh" --root .
 fi
 echo "repo contract ok: $visibility"

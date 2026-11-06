@@ -4,7 +4,7 @@ set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../.." && pwd)"
 HELPER="$ROOT/infra/scripts/ci/validate-publish-targets.sh"
-FIXTURES="$ROOT/infra/config/tests"
+FIXTURES="$ROOT/tests/fixtures/repo"
 tmp="$(mktemp -d)"
 trap 'rm -rf "$tmp"' EXIT
 

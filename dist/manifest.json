@@ -1,5 +1,5 @@
 {
-  "version": "0.1.1",
+  "version": "0.2.0",
   "scripts": {
     "agents.sync-agents": {
       "path": "infra/scripts/agents/sync-agents.sh",
@@ -7,7 +7,7 @@
     },
     "check-layout": {
       "path": "infra/scripts/check-layout.sh",
-      "sha256": "c8c44b9cd086a6bfc1d9d9176a98428e09dd697d56fc0bc9b2e0b1b6d2b50150"
+      "sha256": "adaf485affee85f37a57ee3cbe11d78c6042fa74e152bf9727be900ddd53bc8a"
     },
     "check-version": {
       "path": "infra/scripts/check-version.sh",
@@ -19,23 +19,27 @@
     },
     "ci.entrypoint": {
       "path": "infra/scripts/ci/entrypoint.sh",
-      "sha256": "caebe49dd613438a5ef9180f681cadf29df6b13daf229195ff57a4bf2e5dda60"
+      "sha256": "d23f17180cf493dc9ab40ec766e9af972894d10510cdfbf1382e419b99675833"
     },
     "ci.pr-size-check": {
       "path": "infra/scripts/ci/pr-size-check.sh",
       "sha256": "9870c97cc8cfef9bd5c967f7dc5a56913c06ef46036bbc2fae515667add5912b"
     },
+    "ci.self-test": {
+      "path": "infra/scripts/ci/self-test.sh",
+      "sha256": "b67a141d45b7a3b899a9b1676f605d3cd9b3d6192ac63f5ab3ea9167826fb15f"
+    },
     "ci.test-publish-targets": {
       "path": "infra/scripts/ci/test-publish-targets.sh",
-      "sha256": "d7950b989cc713fbedba03ef81df3e19c9ca717693902f1c217f1d00c941e05d"
+      "sha256": "23458dad0126277ecbdd32d27b9553b429153a6edb0ca1a2cc14b5c6b41534da"
     },
     "ci.test-render": {
       "path": "infra/scripts/ci/test-render.sh",
-      "sha256": "1ad022a6263c280c0440875522dd39eaa23a52bad572f0c3201f5ba7815ef9c9"
+      "sha256": "0b1fb6dcf2b31522a3ca42d3976142e70326181f8d57f560e3316fda80f7bafe"
     },
     "ci.test-repo-contract": {
       "path": "infra/scripts/ci/test-repo-contract.sh",
-      "sha256": "f722f22597d4fef3dab76d3a70ecccc3e75b41edc838a8e09d8034c60b28cdab"
+      "sha256": "54b78ba1878ad271ccea3e611542bafe7401f47992bad5a5a4de4eb5d8e3e537"
     },
     "ci.validate-coverage": {
       "path": "infra/scripts/ci/validate-coverage.sh",
@@ -71,7 +75,7 @@
     },
     "ci.validate-repo": {
       "path": "infra/scripts/ci/validate-repo.sh",
-      "sha256": "90d7d78164d71f1d4550863514f57ef6291824e2820df12f180b8205b5703228"
+      "sha256": "23bacfe0e6ce8ac480ea520ea2164140cdd175f226575ff4b0d4240cdd329c92"
     },
     "ci.validate-risk": {
       "path": "infra/scripts/ci/validate-risk.sh",
@@ -87,11 +91,11 @@
     },
     "ci": {
       "path": "infra/scripts/ci.sh",
-      "sha256": "0550f156514657a2b7e6c828846e2b581ace8dab603ed1fd099a97bbe1e45795"
+      "sha256": "d42867c3070fb87ea1903e78adad31787456a70e62ac58f03592ca3d5e14eb0a"
     },
     "release": {
       "path": "infra/scripts/release.sh",
-      "sha256": "44593ef6eb85f93479b5f8d181678fec01832a5cd0ccb4993d5f338640dc8b93"
+      "sha256": "621fd39c1e1a71c00d28d395ed2fd6273cfa042aaa612f67479b667cfcfe0452"
     },
     "render-ci-profile": {
       "path": "infra/scripts/render-ci-profile.sh",

@@ -31,7 +31,7 @@ for dir in src infra docs; do
   [[ -d "$dir" ]] || fail "missing required directory: $dir/"
 done
 
-for f in README.md infra/config/repo.json infra/docker/ci.dockerfile infra/scripts/ci.sh; do
+for f in README.md infra/config/repo.json; do
   [[ -s "$f" ]] || fail "missing required file: $f"
 done
 

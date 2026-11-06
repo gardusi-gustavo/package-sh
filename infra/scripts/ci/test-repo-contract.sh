@@ -4,7 +4,7 @@ set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../.." && pwd)"
 HELPER="$ROOT/infra/scripts/ci/validate-repo-contract.sh"
-FIXTURES="$ROOT/infra/config/tests"
+FIXTURES="$ROOT/tests/fixtures/repo"
 
 [[ -x "$HELPER" ]] || { echo "error: missing $HELPER" >&2; exit 2; }
 [[ -d "$FIXTURES" ]] || { echo "error: missing $FIXTURES" >&2; exit 2; }
