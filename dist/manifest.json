@@ -1,0 +1,117 @@
+{
+  "version": "0.1.0",
+  "scripts": {
+    "agents.sync-agents": {
+      "path": "infra/scripts/agents/sync-agents.sh",
+      "sha256": "5fa956933cb43d05721293e64826d2b404b4508978524737bbcfd41c92209a5d"
+    },
+    "check-layout": {
+      "path": "infra/scripts/check-layout.sh",
+      "sha256": "c8c44b9cd086a6bfc1d9d9176a98428e09dd697d56fc0bc9b2e0b1b6d2b50150"
+    },
+    "check-version": {
+      "path": "infra/scripts/check-version.sh",
+      "sha256": "7e58019b44d707f2800133892fb3d4fb071ffabf9cff4c5e4232554b1e7ee9e0"
+    },
+    "ci.check-size": {
+      "path": "infra/scripts/ci/check-size.sh",
+      "sha256": "7e02e90cb9875a9b6a9682001b7086e47ead0a781175ab4bc74a1716a92abd6c"
+    },
+    "ci.entrypoint": {
+      "path": "infra/scripts/ci/entrypoint.sh",
+      "sha256": "caebe49dd613438a5ef9180f681cadf29df6b13daf229195ff57a4bf2e5dda60"
+    },
+    "ci.pr-size-check": {
+      "path": "infra/scripts/ci/pr-size-check.sh",
+      "sha256": "9870c97cc8cfef9bd5c967f7dc5a56913c06ef46036bbc2fae515667add5912b"
+    },
+    "ci.test-publish-targets": {
+      "path": "infra/scripts/ci/test-publish-targets.sh",
+      "sha256": "d7950b989cc713fbedba03ef81df3e19c9ca717693902f1c217f1d00c941e05d"
+    },
+    "ci.test-render": {
+      "path": "infra/scripts/ci/test-render.sh",
+      "sha256": "1ad022a6263c280c0440875522dd39eaa23a52bad572f0c3201f5ba7815ef9c9"
+    },
+    "ci.test-repo-contract": {
+      "path": "infra/scripts/ci/test-repo-contract.sh",
+      "sha256": "f722f22597d4fef3dab76d3a70ecccc3e75b41edc838a8e09d8034c60b28cdab"
+    },
+    "ci.validate-coverage": {
+      "path": "infra/scripts/ci/validate-coverage.sh",
+      "sha256": "590061f5bec5352d4f869599e92146400d23e1775ee84f9b604e43a52b1c6750"
+    },
+    "ci.validate-files": {
+      "path": "infra/scripts/ci/validate-files.sh",
+      "sha256": "8c9055827ba0fff10fdc86a82fbf5caec774813682c9aa9d19864e8dc98ca140"
+    },
+    "ci.validate-labels": {
+      "path": "infra/scripts/ci/validate-labels.sh",
+      "sha256": "29ab1627285e22787558ad1975631a163cef900f2cb96e4fc65ee17dcc17eea9"
+    },
+    "ci.validate-md-links": {
+      "path": "infra/scripts/ci/validate-md-links.sh",
+      "sha256": "a75857e1a38d8e07ae0c97555c359ae4b99179ab78522aacd598e9c1384bb40a"
+    },
+    "ci.validate-pr-count": {
+      "path": "infra/scripts/ci/validate-pr-count.sh",
+      "sha256": "b578de8ec612fa192f96fdceeaf48242f120e59fcf01a03a623be32d18b2cfc6"
+    },
+    "ci.validate-pr-size": {
+      "path": "infra/scripts/ci/validate-pr-size.sh",
+      "sha256": "3c6a47414df576ed45da842d840fc19d3d51c1b00edf87fcc81d404563512bc9"
+    },
+    "ci.validate-publish-targets": {
+      "path": "infra/scripts/ci/validate-publish-targets.sh",
+      "sha256": "ef6afe43c4e203598374944dfa85c876b2c36bfdb215817129dcdb69c3f49ea5"
+    },
+    "ci.validate-repo-contract": {
+      "path": "infra/scripts/ci/validate-repo-contract.sh",
+      "sha256": "1b5a5848649ca6ac821d3d46e9d629dd74ec6631ecadb1c56ef2d5a933ff9245"
+    },
+    "ci.validate-repo": {
+      "path": "infra/scripts/ci/validate-repo.sh",
+      "sha256": "90d7d78164d71f1d4550863514f57ef6291824e2820df12f180b8205b5703228"
+    },
+    "ci.validate-risk": {
+      "path": "infra/scripts/ci/validate-risk.sh",
+      "sha256": "82b4a9ad567d88b62fbfa78a10c737fe2ea1a972a5174653fa5ae95e732c23fb"
+    },
+    "ci-entrypoint": {
+      "path": "infra/scripts/ci-entrypoint.sh",
+      "sha256": "385b405079a9a442b4c771447b86dc5b9f56eb85de7a2d6a0562cb91c380e1bc"
+    },
+    "ci-lint": {
+      "path": "infra/scripts/ci-lint.sh",
+      "sha256": "eee8e1da09d72ac33729b978f602aacb67abd3a14fc3c6723b6ba8ad80acc437"
+    },
+    "ci": {
+      "path": "infra/scripts/ci.sh",
+      "sha256": "0550f156514657a2b7e6c828846e2b581ace8dab603ed1fd099a97bbe1e45795"
+    },
+    "release": {
+      "path": "infra/scripts/release.sh",
+      "sha256": "44593ef6eb85f93479b5f8d181678fec01832a5cd0ccb4993d5f338640dc8b93"
+    },
+    "render-ci-profile": {
+      "path": "infra/scripts/render-ci-profile.sh",
+      "sha256": "0d94e70b2f362a8f525f9e84812dc9e217b74ee29b41a548167fb6035a0ab15a"
+    },
+    "render-hubs": {
+      "path": "infra/scripts/render-hubs.sh",
+      "sha256": "0c465d490c7c273973ba54b031e3c006cab29a0c61a45daea8ae67b55b327c81"
+    },
+    "retry": {
+      "path": "infra/scripts/retry.sh",
+      "sha256": "460db23434e3adb09fc70ca3ef21e3c7b88a0b6903cf635dfa88c8960b979bb0"
+    },
+    "ship-tag": {
+      "path": "infra/scripts/ship-tag.sh",
+      "sha256": "1990aaec099ffe8c2ba08fe1f35ac04dcc9b437ede1f1808fb12c85bdd39e819"
+    },
+    "sync-template": {
+      "path": "infra/scripts/sync-template.sh",
+      "sha256": "796f83e8d8b93e5c0ea88ed92f9b3e81ec0ba0cc707ec451119b34b7d863d4a5"
+    }
+  }
+}
