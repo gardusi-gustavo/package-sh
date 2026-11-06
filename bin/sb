@@ -85,9 +85,7 @@ case "$cmd" in
       file="$ROOT/$path"
       [[ -s "$file" ]] || file="$CACHE/$path"
       if [[ ! -s "$file" ]]; then
-        echo "missing: $name" >&2
-        fail=1
-        continue
+        file="$(fetch_script "$name")"
       fi
       if ! printf '%s  %s\n' "$sha" "$file" | sha256sum -c - >/dev/null; then
         echo "checksum failed: $name" >&2
