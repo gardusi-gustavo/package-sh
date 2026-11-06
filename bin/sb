@@ -1,0 +1,107 @@
+#!/usr/bin/env bash
+# Small package runner for the versioned shell-bash scripts.
+set -euo pipefail
+
+VERSION="${SB_VERSION:-0.1.0}"
+BASE_URL="${SB_BASE_URL:-http://gitea:3000/packages/shell-bash}"
+TAG="${SB_TAG:-v$VERSION}"
+CACHE="${XDG_CACHE_HOME:-$HOME/.cache}/sb/$VERSION"
+HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+ROOT="$(cd "$HERE/.." && pwd)"
+[[ -s "$ROOT/VERSION" ]] && VERSION="$(tr -d '[:space:]' < "$ROOT/VERSION")"
+[[ -s "$ROOT/dist/manifest.json" ]] && MANIFEST="$ROOT/dist/manifest.json"
+MANIFEST="${MANIFEST:-$CACHE/manifest.json}"
+
+usage() {
+  cat <<'EOF'
+usage: sb <list|fetch|run|verify|version>
+
+  list                 list available scripts
+  fetch NAME           download and verify one script
+  run NAME [-- ARGS]   download if needed, then run the script
+  verify               verify downloaded scripts and the manifest
+  version              print the runner version
+EOF
+}
+
+ensure_manifest() {
+  [[ -s "$MANIFEST" ]] && return
+  mkdir -p "$CACHE"
+  curl -fsSL "$BASE_URL/raw/tag/$TAG/dist/manifest.json" -o "$MANIFEST"
+}
+
+script_path() {
+  jq -r --arg n "$1" '.scripts[$n].path // empty' "$MANIFEST"
+}
+script_sha() {
+  jq -r --arg n "$1" '.scripts[$n].sha256 // empty' "$MANIFEST"
+}
+
+fetch_script() {
+  local name="$1" path sha dest
+  ensure_manifest
+  path="$(script_path "$name")"
+  sha="$(script_sha "$name")"
+  [[ -n "$path" && -n "$sha" ]] || { echo "unknown script: $name" >&2; exit 2; }
+  dest="$CACHE/$path"
+  mkdir -p "$(dirname "$dest")"
+  if [[ ! -s "$dest" ]]; then
+    curl -fsSL "$BASE_URL/raw/tag/$TAG/$path" -o "$dest"
+  fi
+  printf '%s  %s\n' "$sha" "$dest" | sha256sum -c - >/dev/null || {
+    echo "checksum failed: $name" >&2
+    rm -f "$dest"
+    exit 1
+  }
+  printf '%s\n' "$dest"
+}
+
+cmd="${1:-}"
+shift || true
+case "$cmd" in
+  list)
+    ensure_manifest
+    jq -r '.scripts | keys[]' "$MANIFEST" ;;
+  fetch)
+    name="${1:?usage: sb fetch NAME}"
+    fetch_script "$name" >/dev/null
+    echo "fetched $name" ;;
+  run)
+    name="${1:?usage: sb run NAME [-- ARGS]}"
+    shift || true
+    [[ "${1:-}" == "--" ]] && shift
+    ensure_manifest
+    path="$(script_path "$name")"
+    [[ -n "$path" ]] || { echo "unknown script: $name" >&2; exit 2; }
+    file="$ROOT/$path"
+    if [[ ! -s "$file" ]]; then
+      file="$(fetch_script "$name")"
+    fi
+    exec bash "$file" "$@" ;;
+  verify)
+    ensure_manifest
+    fail=0
+    while IFS=$'\t' read -r name path sha; do
+      file="$ROOT/$path"
+      [[ -s "$file" ]] || file="$CACHE/$path"
+      if [[ ! -s "$file" ]]; then
+        echo "missing: $name" >&2
+        fail=1
+        continue
+      fi
+      if ! printf '%s  %s\n' "$sha" "$file" | sha256sum -c - >/dev/null; then
+        echo "checksum failed: $name" >&2
+        fail=1
+      fi
+    done < <(jq -r '.scripts | to_entries[] | [.key, .value.path, .value.sha256] | @tsv' "$MANIFEST")
+    (( fail == 0 )) || exit 1
+    echo "verify: ok" ;;
+  version)
+    echo "$VERSION" ;;
+  -h|--help|help|"")
+    usage ;;
+  *)
+    echo "unknown command: $cmd" >&2
+    usage >&2
+    exit 2 ;;
+esac
