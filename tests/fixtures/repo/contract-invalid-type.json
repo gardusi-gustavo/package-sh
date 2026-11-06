@@ -1,0 +1,13 @@
+{
+  "schema": 1,
+  "name": "example-repo",
+  "organization": "packages",
+  "layer": "zero",
+  "depends_on": [],
+  "consumers": ["all repositories"],
+  "data_classification": "public",
+  "visibility": "public",
+  "template": {
+    "ref": "1.0.0"
+  }
+}

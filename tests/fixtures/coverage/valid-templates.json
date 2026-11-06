@@ -1,0 +1,10 @@
+{
+  "schema": 1,
+  "domain": "repository-templates",
+  "updated": "2026-10-30",
+  "rows": [
+    {"topic": "repository-layout", "status": "covered", "ref": "docs/repository/layout.md"},
+    {"topic": "issue-labels", "status": "partial", "ref": "docs/repository/labels.md"},
+    {"topic": "coverage-maps", "status": "missing", "ref": null}
+  ]
+}
