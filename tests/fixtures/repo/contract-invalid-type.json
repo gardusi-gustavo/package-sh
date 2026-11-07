@@ -4,10 +4,10 @@
   "organization": "templates",
   "layer": "zero",
   "depends_on": [],
-  "consumers": ["all repositories"],
+  "consumers": [
+    "all repositories"
+  ],
   "data_classification": "public",
   "visibility": "public",
-  "template": {
-    "ref": "1.0.0"
-  }
+  "dependencies": {}
 }

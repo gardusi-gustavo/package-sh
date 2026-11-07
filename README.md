@@ -25,6 +25,16 @@ chmod +x /tmp/sb
 Scripts receive configuration through arguments and the environment. They do
 not source files from `templates/md`.
 
+## Dependencies
+
+Each consumer pins only what it uses:
+
+```bash
+./bin/sb deps install --root .
+./bin/sb deps check --root .
+./bin/sb deps update templates/yml
+```
+
 ## Layout
 
 ```text

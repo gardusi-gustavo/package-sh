@@ -1,5 +1,5 @@
 {
-  "version": "0.4.2",
+  "version": "0.4.3",
   "scripts": {
     "agents.sync-agents": {
       "path": "infra/scripts/agents/sync-agents.sh",
@@ -27,7 +27,7 @@
     },
     "ci.self-test": {
       "path": "infra/scripts/ci/self-test.sh",
-      "sha256": "9f5c665c28a7d17beb271d4c3bb079868c2bc9d4696eb34f41de86ff1c660fe6"
+      "sha256": "77a5563b1a6667a4f58be36b59ec67d03f6a69f88e694c7444cc053d01456fe4"
     },
     "ci.test-local-issues": {
       "path": "infra/scripts/ci/test-local-issues.sh",
@@ -39,7 +39,7 @@
     },
     "ci.test-render": {
       "path": "infra/scripts/ci/test-render.sh",
-      "sha256": "0b1fb6dcf2b31522a3ca42d3976142e70326181f8d57f560e3316fda80f7bafe"
+      "sha256": "c6a00088b494e0f10ede85440cb035d420a5a316e58c77e5da891572c3292ee1"
     },
     "ci.test-repo-contract": {
       "path": "infra/scripts/ci/test-repo-contract.sh",
@@ -79,7 +79,7 @@
     },
     "ci.validate-repo-contract": {
       "path": "infra/scripts/ci/validate-repo-contract.sh",
-      "sha256": "1b5a5848649ca6ac821d3d46e9d629dd74ec6631ecadb1c56ef2d5a933ff9245"
+      "sha256": "7f84e64ee3a37871d419d0b500a0ac9d4918d585469fff5751a4ec4a5574f8b0"
     },
     "ci.validate-repo": {
       "path": "infra/scripts/ci/validate-repo.sh",
@@ -120,10 +120,6 @@
     "ship-tag": {
       "path": "infra/scripts/ship-tag.sh",
       "sha256": "1990aaec099ffe8c2ba08fe1f35ac04dcc9b437ede1f1808fb12c85bdd39e819"
-    },
-    "sync-template": {
-      "path": "infra/scripts/sync-template.sh",
-      "sha256": "796f83e8d8b93e5c0ea88ed92f9b3e81ec0ba0cc707ec451119b34b7d863d4a5"
     }
   },
   "files": {
