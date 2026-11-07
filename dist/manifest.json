@@ -1,5 +1,5 @@
 {
-  "version": "0.5.1",
+  "version": "0.5.2",
   "scripts": {
     "agents.sync-agents": {
       "path": "infra/scripts/agents/sync-agents.sh",
@@ -120,6 +120,110 @@
     "ship-tag": {
       "path": "infra/scripts/ship-tag.sh",
       "sha256": "1990aaec099ffe8c2ba08fe1f35ac04dcc9b437ede1f1808fb12c85bdd39e819"
+    },
+    "vault.scan": {
+      "path": "infra/scripts/workflow/step.sh",
+      "sha256": "117bb1e7621a3addc336a45bb59e44b1328557c88801dbaea71e2868eb9a2bea"
+    },
+    "vault.classify": {
+      "path": "infra/scripts/workflow/step.sh",
+      "sha256": "117bb1e7621a3addc336a45bb59e44b1328557c88801dbaea71e2868eb9a2bea"
+    },
+    "vault.plan": {
+      "path": "infra/scripts/workflow/step.sh",
+      "sha256": "117bb1e7621a3addc336a45bb59e44b1328557c88801dbaea71e2868eb9a2bea"
+    },
+    "vault.reconcile": {
+      "path": "infra/scripts/workflow/step.sh",
+      "sha256": "117bb1e7621a3addc336a45bb59e44b1328557c88801dbaea71e2868eb9a2bea"
+    },
+    "vault.render": {
+      "path": "infra/scripts/workflow/step.sh",
+      "sha256": "117bb1e7621a3addc336a45bb59e44b1328557c88801dbaea71e2868eb9a2bea"
+    },
+    "vault.fetch": {
+      "path": "infra/scripts/workflow/step.sh",
+      "sha256": "117bb1e7621a3addc336a45bb59e44b1328557c88801dbaea71e2868eb9a2bea"
+    },
+    "vault.transform": {
+      "path": "infra/scripts/workflow/step.sh",
+      "sha256": "117bb1e7621a3addc336a45bb59e44b1328557c88801dbaea71e2868eb9a2bea"
+    },
+    "vault.verify": {
+      "path": "infra/scripts/workflow/step.sh",
+      "sha256": "117bb1e7621a3addc336a45bb59e44b1328557c88801dbaea71e2868eb9a2bea"
+    },
+    "vault.publish": {
+      "path": "infra/scripts/workflow/step.sh",
+      "sha256": "117bb1e7621a3addc336a45bb59e44b1328557c88801dbaea71e2868eb9a2bea"
+    },
+    "vault.cleanup": {
+      "path": "infra/scripts/workflow/step.sh",
+      "sha256": "117bb1e7621a3addc336a45bb59e44b1328557c88801dbaea71e2868eb9a2bea"
+    },
+    "backup.preflight": {
+      "path": "infra/scripts/workflow/step.sh",
+      "sha256": "117bb1e7621a3addc336a45bb59e44b1328557c88801dbaea71e2868eb9a2bea"
+    },
+    "backup.lock": {
+      "path": "infra/scripts/workflow/step.sh",
+      "sha256": "117bb1e7621a3addc336a45bb59e44b1328557c88801dbaea71e2868eb9a2bea"
+    },
+    "backup.quiesce": {
+      "path": "infra/scripts/workflow/step.sh",
+      "sha256": "117bb1e7621a3addc336a45bb59e44b1328557c88801dbaea71e2868eb9a2bea"
+    },
+    "backup.dump": {
+      "path": "infra/scripts/workflow/step.sh",
+      "sha256": "117bb1e7621a3addc336a45bb59e44b1328557c88801dbaea71e2868eb9a2bea"
+    },
+    "backup.validate": {
+      "path": "infra/scripts/workflow/step.sh",
+      "sha256": "117bb1e7621a3addc336a45bb59e44b1328557c88801dbaea71e2868eb9a2bea"
+    },
+    "backup.manifest": {
+      "path": "infra/scripts/workflow/step.sh",
+      "sha256": "117bb1e7621a3addc336a45bb59e44b1328557c88801dbaea71e2868eb9a2bea"
+    },
+    "backup.archive": {
+      "path": "infra/scripts/workflow/step.sh",
+      "sha256": "117bb1e7621a3addc336a45bb59e44b1328557c88801dbaea71e2868eb9a2bea"
+    },
+    "backup.test": {
+      "path": "infra/scripts/workflow/step.sh",
+      "sha256": "117bb1e7621a3addc336a45bb59e44b1328557c88801dbaea71e2868eb9a2bea"
+    },
+    "backup.copy": {
+      "path": "infra/scripts/workflow/step.sh",
+      "sha256": "117bb1e7621a3addc336a45bb59e44b1328557c88801dbaea71e2868eb9a2bea"
+    },
+    "backup.verify_copy": {
+      "path": "infra/scripts/workflow/step.sh",
+      "sha256": "117bb1e7621a3addc336a45bb59e44b1328557c88801dbaea71e2868eb9a2bea"
+    },
+    "backup.publish_copy": {
+      "path": "infra/scripts/workflow/step.sh",
+      "sha256": "117bb1e7621a3addc336a45bb59e44b1328557c88801dbaea71e2868eb9a2bea"
+    },
+    "backup.reconcile": {
+      "path": "infra/scripts/workflow/step.sh",
+      "sha256": "117bb1e7621a3addc336a45bb59e44b1328557c88801dbaea71e2868eb9a2bea"
+    },
+    "backup.prune": {
+      "path": "infra/scripts/workflow/step.sh",
+      "sha256": "117bb1e7621a3addc336a45bb59e44b1328557c88801dbaea71e2868eb9a2bea"
+    },
+    "backup.status": {
+      "path": "infra/scripts/workflow/step.sh",
+      "sha256": "117bb1e7621a3addc336a45bb59e44b1328557c88801dbaea71e2868eb9a2bea"
+    },
+    "backup.resume": {
+      "path": "infra/scripts/workflow/step.sh",
+      "sha256": "117bb1e7621a3addc336a45bb59e44b1328557c88801dbaea71e2868eb9a2bea"
+    },
+    "backup.unlock": {
+      "path": "infra/scripts/workflow/step.sh",
+      "sha256": "117bb1e7621a3addc336a45bb59e44b1328557c88801dbaea71e2868eb9a2bea"
     }
   },
   "files": {
