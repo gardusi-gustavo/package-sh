@@ -1,5 +1,5 @@
 {
-  "version": "0.4.1",
+  "version": "0.4.2",
   "scripts": {
     "agents.sync-agents": {
       "path": "infra/scripts/agents/sync-agents.sh",
@@ -139,6 +139,18 @@
       "target": ".githooks/pre-commit",
       "sha256": "40719d90f1c4a2fa930f337397cca739ac9d111d7bea2abab211bc61210fca44"
     },
+    "scripts/pr-limit": {
+      "target": ".githooks/pr-limit",
+      "sha256": "daa31bc8225e58787eb770e39fe4b1925278e6ae6d02562f058595c1878b94da"
+    },
+    "scripts/pr-size": {
+      "target": ".githooks/pr-size",
+      "sha256": "2234ee48e9935c46482a935f073d4c2ef527300929ca8293c9714b7e22055449"
+    },
+    "scripts/pr-size-check.sh": {
+      "target": ".githooks/pr-size-check.sh",
+      "sha256": "9870c97cc8cfef9bd5c967f7dc5a56913c06ef46036bbc2fae515667add5912b"
+    },
     "scripts/install-hooks.sh": {
       "target": "infra/scripts/git/install-hooks.sh",
       "sha256": "8c44ce4c94af808dc442646828e3e3f587af00164f64e5798fd148d9cb55cf73"
@@ -146,18 +158,6 @@
     "scripts/init-repo.sh": {
       "target": "infra/scripts/git/init-repo.sh",
       "sha256": "fb2d9e0bb7fc5733dda4fd103702eb16599cdf0723e9e7484b68bb22727158ae"
-    },
-    "scripts/pr-limit": {
-      "target": "infra/scripts/git/pr-limit",
-      "sha256": "daa31bc8225e58787eb770e39fe4b1925278e6ae6d02562f058595c1878b94da"
-    },
-    "scripts/pr-size": {
-      "target": "infra/scripts/git/pr-size",
-      "sha256": "2234ee48e9935c46482a935f073d4c2ef527300929ca8293c9714b7e22055449"
-    },
-    "scripts/pr-size-check.sh": {
-      "target": "infra/scripts/git/pr-size-check.sh",
-      "sha256": "9870c97cc8cfef9bd5c967f7dc5a56913c06ef46036bbc2fae515667add5912b"
     },
     "bin/sb": {
       "target": "bin/sb",
