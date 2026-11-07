@@ -7,4 +7,5 @@ find infra/scripts -name '*.sh' -print0 | xargs -0 -n1 bash -n
 bash infra/scripts/ci/test-repo-contract.sh
 bash infra/scripts/ci/test-publish-targets.sh
 bash infra/scripts/ci/test-render.sh
+bash infra/scripts/ci/test-local-issues.sh
 echo "self-test: ok"

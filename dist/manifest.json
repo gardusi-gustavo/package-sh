@@ -1,9 +1,9 @@
 {
-  "version": "0.2.0",
+  "version": "0.3.0",
   "scripts": {
     "agents.sync-agents": {
       "path": "infra/scripts/agents/sync-agents.sh",
-      "sha256": "5fa956933cb43d05721293e64826d2b404b4508978524737bbcfd41c92209a5d"
+      "sha256": "08b84870f572f35eeae4fc01c61cc1232c86c36f53304a204cee3a13e9006454"
     },
     "check-layout": {
       "path": "infra/scripts/check-layout.sh",
@@ -27,11 +27,15 @@
     },
     "ci.self-test": {
       "path": "infra/scripts/ci/self-test.sh",
-      "sha256": "b67a141d45b7a3b899a9b1676f605d3cd9b3d6192ac63f5ab3ea9167826fb15f"
+      "sha256": "9f5c665c28a7d17beb271d4c3bb079868c2bc9d4696eb34f41de86ff1c660fe6"
+    },
+    "ci.test-local-issues": {
+      "path": "infra/scripts/ci/test-local-issues.sh",
+      "sha256": "73677c30b8739b6341063d09a005160d54700a35a972d2f289b12cc18909ef12"
     },
     "ci.test-publish-targets": {
       "path": "infra/scripts/ci/test-publish-targets.sh",
-      "sha256": "23458dad0126277ecbdd32d27b9553b429153a6edb0ca1a2cc14b5c6b41534da"
+      "sha256": "6410bad34623b2d7cbab3844b58a41dd81304bf3ecebd4592d745bbcd650f068"
     },
     "ci.test-render": {
       "path": "infra/scripts/ci/test-render.sh",
@@ -52,6 +56,10 @@
     "ci.validate-labels": {
       "path": "infra/scripts/ci/validate-labels.sh",
       "sha256": "29ab1627285e22787558ad1975631a163cef900f2cb96e4fc65ee17dcc17eea9"
+    },
+    "ci.validate-local-issues": {
+      "path": "infra/scripts/ci/validate-local-issues.sh",
+      "sha256": "99d5313be75c5f51346f378884de9259263c7cc2ec9782dc3b1cdfda15821866"
     },
     "ci.validate-md-links": {
       "path": "infra/scripts/ci/validate-md-links.sh",
@@ -95,7 +103,7 @@
     },
     "release": {
       "path": "infra/scripts/release.sh",
-      "sha256": "621fd39c1e1a71c00d28d395ed2fd6273cfa042aaa612f67479b667cfcfe0452"
+      "sha256": "90285ffcae4e7b7420ce5256c627cad4b01e713de553c6728814c4d369ccb6cc"
     },
     "render-ci-profile": {
       "path": "infra/scripts/render-ci-profile.sh",
