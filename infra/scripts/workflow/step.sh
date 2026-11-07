@@ -57,7 +57,9 @@ fi
 [[ -n "$INPUT_JSON" ]] || INPUT_JSON='{}'
 jq -e . >/dev/null <<<"$INPUT_JSON" || die "input is not valid JSON"
 
-input_get() { jq -r "$1 // empty" <<<"$INPUT_JSON"; }
+input_get() {
+  jq -r "($1 // (if has(\"items\") and (.items|type)==\"array\" then .items[0] | $1 else null end)) // empty" <<<"$INPUT_JSON"
+}
 input_items() {
   jq -c 'if type == "array" then .[] elif type == "object" and has("items") then .items[] else . end' <<<"$INPUT_JSON"
 }
@@ -72,6 +74,7 @@ emit() {
   fi
 }
 
+emit_item() { emit "$(jq -nc --argjson item "$1" '{scope:"all",count:1,items:[$item]}')"; }
 now() { date -u +%Y-%m-%dT%H:%M:%SZ; }
 sha_of() { sha256sum "$1" | awk '{print $1}'; }
 size_of() { stat -c %s "$1"; }
@@ -107,7 +110,7 @@ vault_scan() {
     emit "$(jq -nc --arg store "$store_root" --argjson n "$n" '{dry_run:true,step:"vault.scan",store_root:$store,items:$n}')"
     return
   fi
-  emit "$(jq -s '{items:.}' "$out")"
+  emit "$(jq -s '{scope:"all",count:length,items:.}' "$out")"
 }
 
 vault_classify() {
@@ -154,7 +157,7 @@ vault_classify() {
     jq -c --arg stage processing --arg status "$status" --arg ticket "$ticket" --arg reason "$reason" --arg domain "$domain" \
       '. + {stage:$stage,status:$status,ticket_id:(if $ticket=="" then null else $ticket end),reason:(if $reason=="" then null else $reason end),domain:$domain}' <<<"$item" >>"$out"
   done < <(input_items)
-  emit "$(jq -s '{items:.}' "$out")"
+  emit "$(jq -s '{scope:"all",count:length,items:.}' "$out")"
 }
 
 vault_plan() {
@@ -175,7 +178,7 @@ vault_plan() {
     jq -nc --arg id "$id" --arg action "$action" --arg step "$step" --arg ticket "$ticket" \
       '{item_id:$id,action:$action,step:$step,priority:1,ticket_id:(if $ticket=="" then null else $ticket end),reason:null}' >>"$out"
   done < <(input_items)
-  emit "$(jq -s '{actions:.}' "$out")"
+  emit "$(jq -s '{scope:"all",count:length,actions:.}' "$out")"
 }
 
 vault_reconcile() {
@@ -193,10 +196,10 @@ vault_reconcile() {
   emit "$(jq -nc --arg now "$(now)" \
     --argjson sc "$(wc -l <"$sfile" | tr -d ' ')" \
     --argjson cc "$(wc -l <"$cfile" | tr -d ' ')" \
-    --argjson missing "$(jq -R -s 'split("\n")|map(select(length>0))' "$missing")" \
-    --argjson extra "$(jq -R -s 'split("\n")|map(select(length>0))' "$extra")" \
+    --argjson missing "$(wc -l <"$missing" | tr -d ' ')" \
+    --argjson extra "$(wc -l <"$extra" | tr -d ' ')" \
     --argjson stage_counts '{}' \
-    '{checked_at:$now,store_items:$sc,card_items:$cc,missing_on_card:$missing,extra_on_card:$extra,hash_mismatches:[],stage_counts:$stage_counts}')"
+    '{checked_at:$now,store_items:$sc,card_items:$cc,missing_count:$missing,extra_count:$extra,hash_mismatch_count:0,stage_counts:$stage_counts}')"
 }
 
 vault_render() {
@@ -204,8 +207,8 @@ vault_render() {
   now="$(now)"
   sc="$(jq -r '.store_items // 0' <<<"$INPUT_JSON")"
   cc="$(jq -r '.card_items // 0' <<<"$INPUT_JSON")"
-  missing="$(jq -r '.missing_on_card | length // 0' <<<"$INPUT_JSON" 2>/dev/null || echo 0)"
-  extra="$(jq -r '.extra_on_card | length // 0' <<<"$INPUT_JSON" 2>/dev/null || echo 0)"
+  missing="$(jq -r '(.missing_count // (.missing_on_card | length)) // 0' <<<"$INPUT_JSON" 2>/dev/null || echo 0)"
+  extra="$(jq -r '(.extra_count // (.extra_on_card | length)) // 0' <<<"$INPUT_JSON" 2>/dev/null || echo 0)"
   emit "$(jq -nc --arg run "run-$now" --arg wf "vault.sync" --arg now "$now" \
     --argjson sc "$sc" --argjson cc "$cc" --argjson mi "$missing" --argjson ex "$extra" \
     '{run_id:$run,workflow:$wf,status:"succeeded",started_at:$now,finished_at:$now,counts:{store:$sc,card:$cc,missing:$mi,extra:$ex},warnings:[]}')"
@@ -228,37 +231,63 @@ vault_fetch() {
   mv "$dst.part" "$dst"
   sha="$(sha_of "$dst")"
   out="$(jq -c --arg stage processing --arg sha "$sha" '. + {stage:$stage,sha256:$sha,presence:{store:true,card:false}}' <<<"$INPUT_JSON")"
-  emit "$out"
+  emit_item "$out"
 }
 
 vault_transform() {
   local rel store_root src dst title base sha out
+  local profile_file profile_id resolution video_codec audio_codec target_bitrate container pix_fmt max_short_side max_fps audio_channels subtitles title_tag crf bufsize
   rel="$(input_get '.relpath // .source_path')"
   store_root="$(input_get '.store_root')"
   [[ -n "$rel" && -n "$store_root" ]] || die "vault.transform: relpath and store_root required"
   src="$store_root/$rel"
   [[ -f "$src" ]] || die "vault.transform: missing $src"
+  profile_file="${CONFIG:-$ROOT/data/workflows/vault/media-profile.json}"
+  profile_id="$(input_get '.media_profile_id')"; profile_id="${profile_id:-video-720p-h264-aac}"
+  if [[ -r "$profile_file" ]]; then
+    resolution="$(jq -r '.resolution // "720p"' "$profile_file")"
+    video_codec="$(jq -r '.video_codec // "libx264"' "$profile_file")"
+    audio_codec="$(jq -r '.audio_codec // "aac"' "$profile_file")"
+    target_bitrate="$(jq -r '.target_bitrate // "3000k"' "$profile_file")"
+    container="$(jq -r '.container // "mkv"' "$profile_file")"
+    pix_fmt="$(jq -r '.pix_fmt // "yuv420p"' "$profile_file")"
+    max_short_side="$(jq -r '.max_short_side // 720' "$profile_file")"
+    max_fps="$(jq -r '.max_fps // 30' "$profile_file")"
+    audio_channels="$(jq -r '.audio_channels // 2' "$profile_file")"
+    subtitles="$(jq -r '.subtitles // false' "$profile_file")"
+    title_tag="$(jq -r '.title_tag // true' "$profile_file")"
+    crf="$(jq -r '.crf // 22' "$profile_file")"
+    bufsize="$(jq -r '.bufsize // "6000k"' "$profile_file")"
+  else
+    resolution=720p; video_codec=libx264; audio_codec=aac; target_bitrate=3000k
+    container=mkv; pix_fmt=yuv420p; max_short_side=720; max_fps=30
+    audio_channels=2; subtitles=false; title_tag=true; crf=22; bufsize=6000k
+  fi
   base="${rel%.*}"
-  dst="$store_root/ready/$base.mkv"
+  dst="$store_root/ready/$base.$container"
   title="$(basename "$base")"
   if [[ "$DRY_RUN" == "1" ]]; then
-    emit "$(jq -nc --arg s "$src" --arg d "$dst" '{dry_run:true,step:"vault.transform",source:$s,destination:$d,profile:"h264-720p-aac"}')"
+    emit "$(jq -nc --arg s "$src" --arg d "$dst" --arg p "$profile_id" '{dry_run:true,step:"vault.transform",source:$s,destination:$d,profile:$p}')"
     return
   fi
   need ffmpeg
   mkdir -p "$(dirname "$dst")"
+  local meta=() vf
+  [[ "$title_tag" == "true" ]] && meta=(-metadata "title=$title")
+  vf="scale='if(gt(a,1),-2,${max_short_side})':'if(gt(a,1),${max_short_side},-2)'"
   ffmpeg -hide_banner -loglevel error -y -i "$src" -map 0:v:0 -map 0:a:0? \
-    -vf "scale='if(gt(a,1),-2,720)':'if(gt(a,1),720,-2)'" \
-    -c:v libx264 -preset medium -crf 22 -maxrate 3000k -bufsize 6000k \
-    -c:a aac -b:a 192k -ac 2 -sn -map_metadata -1 -metadata "title=$title" "$dst.part.mkv"
-  mv "$dst.part.mkv" "$dst"
+    -vf "$vf" -r "$max_fps" \
+    -c:v "$video_codec" -preset medium -crf "$crf" -maxrate "$target_bitrate" -bufsize "$bufsize" -pix_fmt "$pix_fmt" \
+    -c:a "$audio_codec" -b:a 192k -ac "$audio_channels" -sn -map_metadata -1 "${meta[@]}" "$dst.part.$container"
+  mv "$dst.part.$container" "$dst"
   sha="$(sha_of "$dst")"
-  out="$(jq -c --arg stage ready --arg sha "$sha" '. + {stage:$stage,sha256:$sha,presence:{store:true,card:false}}' <<<"$INPUT_JSON")"
-  emit "$out"
+  out="$(jq -c --arg stage ready --arg sha "$sha" --arg profile "$profile_id" '. + {stage:$stage,sha256:$sha,presence:{store:true,card:false}}' <<<"$INPUT_JSON")"
+  emit_item "$out"
 }
 
 vault_verify() {
   local store_root rel path sha height vcodec audio subs probe out
+  local profile_file profile_id resolution video_codec expected_vcodec audio_codec target_bitrate container pix_fmt max_short_side max_fps audio_channels subtitles title_tag crf bufsize
   store_root="$(input_get '.store_root')"
   rel="$(input_get '.relpath')"
   path="$(input_get '.source_path // .path')"
@@ -270,19 +299,35 @@ vault_verify() {
     emit "$(jq -nc --arg p "$path" '{dry_run:true,step:"vault.verify",path:$p}')"
     return
   fi
+  profile_file="${CONFIG:-$ROOT/data/workflows/vault/media-profile.json}"
+  profile_id="$(input_get '.media_profile_id')"; profile_id="${profile_id:-video-720p-h264-aac}"
+  if [[ -r "$profile_file" ]]; then
+    video_codec="$(jq -r '.video_codec // "libx264"' "$profile_file")"
+    audio_codec="$(jq -r '.audio_codec // "aac"' "$profile_file")"
+    max_short_side="$(jq -r '.max_short_side // 720' "$profile_file")"
+    max_fps="$(jq -r '.max_fps // 30' "$profile_file")"
+    subtitles="$(jq -r '.subtitles // false' "$profile_file")"
+  else
+    video_codec=libx264; audio_codec=aac; max_short_side=720; max_fps=30; subtitles=false
+  fi
+  case "$video_codec" in
+    libx264) expected_vcodec=h264 ;;
+    libx265) expected_vcodec=hevc ;;
+    *) expected_vcodec="$video_codec" ;;
+  esac
   need ffprobe
   sha="$(sha_of "$path")"
-  probe="$(ffprobe -v error -show_entries stream=codec_type,codec_name,height -of json "$path" 2>/dev/null || true)"
+  probe="$(ffprobe -v error -show_entries stream=codec_type,codec_name,height:stream_tags=language -of json "$path" 2>/dev/null || true)"
   height="$(jq -r '[.streams[]?|select(.codec_type=="video")][0].height // 0' <<<"$probe")"
   vcodec="$(jq -r '[.streams[]?|select(.codec_type=="video")][0].codec_name // ""' <<<"$probe")"
   audio="$(jq -r '[.streams[]?|select(.codec_type=="audio")]|length' <<<"$probe")"
   subs="$(jq -r '[.streams[]?|select(.codec_type=="subtitle")]|length' <<<"$probe")"
-  if [[ "$vcodec" == "h264" && "$height" -le 720 && "$audio" -ge 1 && "$subs" -eq 0 ]]; then
+  if [[ "$vcodec" == "$expected_vcodec" && "$height" -le "$max_short_side" && "$audio" -ge 1 && "$subs" -eq 0 ]]; then
     out="$(jq -c --arg sha "$sha" --arg now "$(now)" '. + {stage:"ready",sha256:$sha,verified:true,verified_at:$now,presence:{store:true,card:false}}' <<<"$INPUT_JSON")"
   else
-    out="$(jq -c '. + {stage:"blocked",reason:"profile mismatch"}' <<<"$INPUT_JSON")"
+    out="$(jq -c --arg reason "profile mismatch" '. + {stage:"blocked",reason:$reason}' <<<"$INPUT_JSON")"
   fi
-  emit "$out"
+  emit_item "$out"
 }
 
 vault_publish() {
@@ -307,7 +352,7 @@ vault_publish() {
   [[ "$src_sha" == "$dst_sha" ]] || die "vault.publish: hash mismatch"
   mv "$dst.part" "$dst"
   out="$(jq -c --arg stage published --arg sha "$src_sha" '. + {stage:$stage,sha256:$sha,presence:{store:true,card:true}}' <<<"$INPUT_JSON")"
-  emit "$out"
+  emit_item "$out"
 }
 
 vault_cleanup() {
@@ -330,7 +375,7 @@ vault_cleanup() {
   [[ "$src_sha" == "$dst_sha" ]] || die "vault.cleanup: hash mismatch"
   rm -f "$src"
   out="$(jq -c --arg sha "$src_sha" '. + {stage:"published",sha256:$sha,presence:{store:false,card:true}}' <<<"$INPUT_JSON")"
-  emit "$out"
+  emit_item "$out"
 }
 
 # ----------------------------------------------------------------- backup
