@@ -9,3 +9,6 @@ Each script is independent and argument-driven.
 
 The `sb` runner resolves scripts from a tagged checkout or from the pinned
 `dist/manifest.json`, verifies their SHA256, then executes them.
+
+- [Local issues](issues/README.md)
+- Self-containment: `repository/self-contained.md`

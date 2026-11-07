@@ -8,4 +8,5 @@ bash infra/scripts/ci/test-repo-contract.sh
 bash infra/scripts/ci/test-publish-targets.sh
 bash infra/scripts/ci/test-render.sh
 bash infra/scripts/ci/test-local-issues.sh
+bash infra/scripts/ci/validate-local-issues.sh --root "$ROOT"
 echo "self-test: ok"
