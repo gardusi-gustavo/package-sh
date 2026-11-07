@@ -21,6 +21,7 @@ usage: sb <list|fetch|run|verify|version|deps>
   fetch NAME           download and verify one script
   run NAME [-- ARGS]   download if needed, then run the script
   verify               verify downloaded scripts and the manifest
+  fetch-all            fetch and verify every script in the manifest
   version              print the runner version
   deps install         install pinned template dependencies from repo.json
   deps check           verify installed template dependencies
@@ -173,7 +174,16 @@ fetch_script() {
     rm -f "$dest"
     exit 1
   }
+  chmod +x "$dest"
   printf '%s\n' "$dest"
+}
+
+fetch_all_scripts() {
+  ensure_manifest
+  while IFS= read -r name; do
+    fetch_script "$name" >/dev/null || return 1
+  done < <(jq -r '.scripts | keys[]' "$MANIFEST")
+  echo "fetched all scripts"
 }
 
 cmd="${1:-}"
@@ -198,6 +208,8 @@ case "$cmd" in
       file="$(fetch_script "$name")"
     fi
     exec bash "$file" "$@" ;;
+  fetch-all)
+    fetch_all_scripts ;;
   verify)
     ensure_manifest
     fail=0
