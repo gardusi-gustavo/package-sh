@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+# Enforce a conventional subject or an issue reference.
+set -euo pipefail
+msg_file="${1:?commit message file required}"
+subject="$(head -n1 "$msg_file")"
+case "$subject" in
+  "Merge "*|"Revert "*|"fixup! "*|"squash! "*) exit 0 ;;
+esac
+if printf '%s\n' "$subject" | grep -Eq '^(feat|fix|docs|refactor|test|chore|ci|build|perf)(\([^)]+\))?: .+' || printf '%s\n' "$subject" | grep -Eq '#[0-9]+'; then
+  exit 0
+fi
+echo "commit-msg: use 'type(scope): subject' or reference an issue (#N)" >&2
+echo "commit-msg: got: $subject" >&2
+exit 1

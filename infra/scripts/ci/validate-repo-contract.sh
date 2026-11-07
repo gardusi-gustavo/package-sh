@@ -35,10 +35,10 @@ check '.depends_on | type == "array" and all(.[]; type == "string" and test("^[a
 check '.consumers | type == "array" and all(.[]; type == "string" and length > 0)' 'consumers must be non-empty strings'
 check '.data_classification | IN("public", "private", "personal", "secret")' 'data_classification is invalid'
 check '.visibility | IN("public", "limited", "private")' 'visibility is invalid'
-check '.template.ref | type == "string" and test("^[0-9]+\\.[0-9]+\\.[0-9]+$")' 'template.ref must be bare semver'
+check '.dependencies | type == "object" and (keys | all(.[]; test("^[a-z0-9-]+/[a-z0-9-]+$"))) and ([.[] | type == "string" and test("^v?[0-9]+\\.[0-9]+\\.[0-9]+$")] | all)' 'dependencies must map owner/repo to vX.Y.Z'
 
 if jq -e 'has("publish")' "$CONFIG" >/dev/null; then
-  check '.publish | type == "array" and all(.[]; IN("npm", "pypi", "crates", "docker"))' 'publish targets are invalid'
+  check '.publish | type == "array" and all(.[]; IN("npm", "pypi", "crates", "docker", "nuget", "go", "maven", "gem", "composer"))' 'publish targets are invalid'
 fi
 
 if jq -e 'has("hubs")' "$CONFIG" >/dev/null; then
@@ -52,7 +52,7 @@ if jq -e 'has("hubs")' "$CONFIG" >/dev/null; then
 fi
 
 if jq -e '.ci | has("profile")' "$CONFIG" >/dev/null; then
-  check '.ci.profile | IN("universal", "base", "python", "node", "go", "rust", "cpp", "java", "media")' 'ci.profile is invalid'
+  check '.ci.profile | IN("universal", "base", "python", "node", "go", "rust", "cpp", "java", "media", "dotnet", "ruby", "php")' 'ci.profile is invalid'
 fi
 
 (( errors == 0 )) || exit 1

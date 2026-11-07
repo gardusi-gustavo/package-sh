@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "name": "example-composer",
-  "organization": "packages",
+  "organization": "templates",
   "layer": 0,
   "depends_on": [],
   "consumers": ["all repositories"],

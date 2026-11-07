@@ -1,0 +1,146 @@
+#!/usr/bin/env bash
+# Read-only review-lane check: at most one open pull request per repository.
+set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+POLICY="${GITEA_PR_POLICY:-$SCRIPT_DIR/../../config/policy.json}"
+if [[ ! -s "$POLICY" ]]; then
+  POLICY="${GITEA_PR_POLICY:-/home/kapetim/repos/dashboards/devops/infra/config/policy.json}"
+fi
+
+MODE=""
+REPO=""
+BRANCH=""
+FIXTURE=""
+CREATE=0
+
+usage() {
+  cat <<'USAGE'
+usage: pr-limit.sh status --repo OWNER/REPO [--fixture FILE]
+       pr-limit.sh check --repo OWNER/REPO --create [--fixture FILE]
+       pr-limit.sh check --repo OWNER/REPO --branch BRANCH [--fixture FILE]
+
+Exit 0 when the action is allowed; non-zero when the review lane is occupied.
+USAGE
+}
+
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    status|check) MODE="$1"; shift ;;
+    --repo)
+      [[ $# -ge 2 ]] || { echo "error: --repo needs a value" >&2; exit 2; }
+      REPO="$2"; shift 2 ;;
+    --branch)
+      [[ $# -ge 2 ]] || { echo "error: --branch needs a value" >&2; exit 2; }
+      BRANCH="$2"; shift 2 ;;
+    --create) CREATE=1; shift ;;
+    --fixture)
+      [[ $# -ge 2 ]] || { echo "error: --fixture needs a value" >&2; exit 2; }
+      FIXTURE="$2"; shift 2 ;;
+    -h|--help) usage; exit 0 ;;
+    *) echo "error: unknown argument: $1" >&2; exit 2 ;;
+  esac
+done
+
+[[ -n "$MODE" ]] || { usage >&2; exit 2; }
+[[ "$REPO" =~ ^[^/]+/[^/]+$ ]] || { echo "error: --repo must be OWNER/REPO" >&2; exit 2; }
+if [[ "$MODE" == "check" && "$CREATE" == "0" && -z "$BRANCH" ]]; then
+  echo "error: check needs --create or --branch" >&2
+  exit 2
+fi
+
+max="1"
+include_drafts="true"
+allow_same="true"
+fail_closed="true"
+if [[ -s "$POLICY" ]]; then
+  max="$(jq -r '.pull_requests.max_open_per_repo // 1' "$POLICY")"
+  include_drafts="$(jq -r '.pull_requests.include_drafts // true' "$POLICY")"
+  allow_same="$(jq -r '.pull_requests.allow_same_head_updates // true' "$POLICY")"
+  fail_closed="$(jq -r '.pull_requests.fail_closed // true' "$POLICY")"
+fi
+[[ "$max" =~ ^[0-9]+$ ]] || max=1
+(( max > 0 )) || max=1
+
+if [[ -n "$FIXTURE" ]]; then
+  [[ -r "$FIXTURE" ]] || { echo "deny $REPO: cannot read fixture: $FIXTURE" >&2; exit 2; }
+  prs="$(cat "$FIXTURE")"
+else
+  if [[ -z "${GITEA_TOKEN:-}" ]]; then
+    for envfile in "${GITEA_ENV_FILE:-}" "$HOME/.config/opencode/gitea.env" "$HOME/.config/gitea/env" /home/kapetim/.config/opencode/gitea.env; do
+      [[ -n "$envfile" && -r "$envfile" ]] || continue
+      # shellcheck disable=SC1090
+      source "$envfile"
+      break
+    done
+  fi
+  : "${GITEA_URL:?GITEA_URL missing}"
+  : "${GITEA_TOKEN:?GITEA_TOKEN missing}"
+  url="${GITEA_URL%/}/api/v1/repos/$REPO/pulls?state=open&limit=100"
+  if ! prs="$(curl -fsS -H "Authorization: token $GITEA_TOKEN" "$url")"; then
+    if [[ "$fail_closed" == "true" ]]; then
+      echo "deny $REPO: cannot read open pull requests" >&2
+      exit 2
+    fi
+    echo "allow $REPO: PR check unavailable (fail_closed=false)" >&2
+    exit 0
+  fi
+fi
+
+jq -e 'type == "array"' <<<"$prs" >/dev/null 2>&1 || {
+  echo "deny $REPO: invalid pull request response" >&2
+  exit 2
+}
+
+filter='.'
+if [[ "$include_drafts" != "true" ]]; then
+  filter='map(select(.draft != true))'
+fi
+
+count="$(jq "$filter | length" <<<"$prs")"
+same_any="$(jq --arg b "$BRANCH" "$filter"' | map(select(.head.ref == $b)) | length' <<<"$prs")"
+same_agent="$(jq --arg b "$BRANCH" --arg a gardusi-gustavo-bot "$filter"' | map(select(.head.ref == $b and .user.login == $a)) | length' <<<"$prs")"
+
+print_open() {
+  jq -r "$filter | .[] | \"  #\(.number) [\(.user.login)] \(.head.ref): \(.title)\"" <<<"$prs" >&2
+}
+
+if [[ "$MODE" == "status" ]]; then
+  if (( count == 0 )); then
+    echo "clear $REPO: no open pull requests"
+    exit 0
+  fi
+  echo "occupied $REPO: $count open pull request(s)" >&2
+  print_open
+  echo "action: merge, close with a restart note, or comment on the existing issue/PR" >&2
+  exit 1
+fi
+
+if (( CREATE == 1 )); then
+  if (( count >= max )); then
+    echo "deny $REPO: $count open pull request(s); merge or close before opening another" >&2
+    print_open
+    exit 1
+  fi
+  echo "allow $REPO: no open pull requests"
+  exit 0
+fi
+
+if (( count == 0 )); then
+  echo "allow $REPO: no open pull requests"
+  exit 0
+fi
+
+if [[ "$allow_same" == "true" ]] && (( same_agent > 0 )); then
+  echo "allow $REPO: $BRANCH is the head of an open gardusi-gustavo-bot PR"
+  exit 0
+fi
+
+if (( same_any > 0 )); then
+  echo "deny $REPO: $BRANCH is an open PR head, but not authored by gardusi-gustavo-bot" >&2
+else
+  echo "deny $REPO: an open PR blocks new branch $BRANCH" >&2
+fi
+print_open
+echo "action: push to an existing gardusi-gustavo-bot PR head or wait" >&2
+exit 1

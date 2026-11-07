@@ -5,11 +5,11 @@ recoverable, and copyable without Gitea.
 
 ## Source of truth
 
-- Repository: `packages/shell-bash`
+- Repository: `templates/sh`
 - Visibility: public
 - Owner: `gardusi-gustavo`
 - Git platform: Gitea
-- Local checkout: `~/repos/packages/shell-bash`
+- Local checkout: `~/repos/templates/sh`
 
 ## Durable data
 

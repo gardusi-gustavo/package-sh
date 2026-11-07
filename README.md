@@ -1,5 +1,4 @@
-# shell-bash
-
+# sh
 Cross-repository shell automation, published as a versioned package and driven
 by the `sb` runner.
 
@@ -9,7 +8,7 @@ Pin a tag. Do not use `main`.
 
 ```bash
 curl -fsSL \
-  "http://gitea:3000/packages/shell-bash/raw/tag/v0.1.0/bin/sb" \
+  "http://gitea:3000/templates/sh/raw/tag/v0.3.1/bin/sb" \
   -o /tmp/sb
 chmod +x /tmp/sb
 /tmp/sb verify
@@ -20,17 +19,19 @@ chmod +x /tmp/sb
 ```bash
 /tmp/sb list
 /tmp/sb run ci.validate --root .
-/tmp/sb run release --version 0.1.0 --root .
+/tmp/sb run release --root .
 ```
 
 Scripts receive configuration through arguments and the environment. They do
-not source files from `packages/templates`.
+not source files from `templates/md`.
 
 ## Layout
 
 ```text
 bin/sb                    runner and fetcher
 infra/scripts/            canonical shell scripts
+hooks/                    Git hooks installed by scripts/install-hooks.sh
+scripts/                  install-hooks.sh, init-repo.sh, pr-limit, pr-size
 tests/fixtures/           validator fixtures
 dist/manifest.json        script paths and checksums
 ```

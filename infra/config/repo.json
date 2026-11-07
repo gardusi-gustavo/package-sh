@@ -1,0 +1,40 @@
+{
+  "schema": 1,
+  "name": "sh",
+  "organization": "templates",
+  "layer": 1,
+  "kind": "template",
+  "visibility": "public",
+  "platforms": [
+    "gitea"
+  ],
+  "features": {
+    "ci": true,
+    "pages": false,
+    "release": true,
+    "observability": false
+  },
+  "limits": {
+    "repo_mb": 100,
+    "file_mb": 25,
+    "max_symlinks": 0
+  },
+  "ci": {
+    "profile": "universal",
+    "script": "infra/scripts/ci.sh",
+    "timeout_minutes": 15,
+    "required_jobs": [
+      "ci"
+    ],
+    "primary": "gitea"
+  },
+  "versioning": {
+    "scheme": "semver",
+    "tag_prefix": "v",
+    "release_artifacts": true
+  },
+  "dependencies": {},
+  "depends_on": [],
+  "consumers": [],
+  "data_classification": "public"
+}

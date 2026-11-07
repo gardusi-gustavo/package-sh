@@ -3,8 +3,8 @@
 Agent work for this repository is stored here as one JSON file per item.
 
 The canonical schema and lifecycle are in
-`packages/templates/docs/issues/README.md` and
-`packages/templates/docs/issues/schema.json`.
+`templates/md/docs/issues/README.md` and
+`templates/md/docs/issues/schema.json`.
 
 Rules:
 

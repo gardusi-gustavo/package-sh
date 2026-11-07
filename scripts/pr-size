@@ -1,0 +1,81 @@
+#!/usr/bin/env bash
+# Review-load budget check for the local pre-push guard.
+set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+CHECK="${PR_SIZE_CHECK:-}"
+if [[ -z "$CHECK" ]]; then
+  for candidate in "$SCRIPT_DIR/pr-size-check.sh" "$SCRIPT_DIR/../ci/pr-size-check.sh"; do
+    if [[ -r "$candidate" ]]; then CHECK="$candidate"; break; fi
+  done
+fi
+POLICY="${GITEA_PR_POLICY:-$SCRIPT_DIR/../../config/policy.json}"
+
+REPO=""
+BRANCH=""
+HEAD="HEAD"
+BASE="origin/main"
+REPO_ROOT=""
+FIXTURE=""
+REPO_CONFIG=""
+PR_NUMBER=""
+
+usage() {
+  cat <<'USAGE'
+usage: pr-size.sh check --repo OWNER/REPO [options]
+
+Options:
+  --branch NAME          branch under review (accepted for compatibility)
+  --head REF             head SHA or ref (default: HEAD)
+  --base REF             base ref (default: origin/main)
+  --repo-root PATH       local repository root
+  --fixture FILE         JSON fixture; no git required
+  --policy FILE          policy file
+  --repo-config FILE     repo.json with pull_request_limits
+  --pr-number N          accepted for compatibility
+  -h, --help             show this help
+USAGE
+}
+
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    check) shift ;;
+    --repo) REPO="${2:-}"; shift 2 ;;
+    --branch) BRANCH="${2:-}"; shift 2 ;;
+    --head) HEAD="${2:-}"; shift 2 ;;
+    --base) BASE="${2:-}"; shift 2 ;;
+    --repo-root) REPO_ROOT="${2:-}"; shift 2 ;;
+    --fixture) FIXTURE="${2:-}"; shift 2 ;;
+    --policy) POLICY="${2:-}"; shift 2 ;;
+    --repo-config) REPO_CONFIG="${2:-}"; shift 2 ;;
+    --pr-number) PR_NUMBER="${2:-}"; shift 2 ;;
+    -h|--help) usage; exit 0 ;;
+    *) echo "error: unknown argument: $1" >&2; exit 2 ;;
+  esac
+done
+# shellcheck disable=SC2034
+: "$BRANCH" "$PR_NUMBER"
+
+[[ "$REPO" =~ ^[^/]+/[^/]+$ ]] || { echo "error: --repo must be OWNER/REPO" >&2; exit 2; }
+[[ -r "$CHECK" ]] || { echo "error: missing $CHECK" >&2; exit 2; }
+
+tmpdir="$(mktemp -d)"
+trap 'rm -rf "$tmpdir"' EXIT
+
+if [[ -z "$REPO_CONFIG" && -n "$REPO_ROOT" ]]; then
+  if git -C "$REPO_ROOT" show "origin/main:infra/config/repo.json" > "$tmpdir/repo.json" 2>/dev/null; then
+    REPO_CONFIG="$tmpdir/repo.json"
+  fi
+fi
+
+args=(--repo "$REPO" --base "$BASE" --head "$HEAD")
+if [[ -n "$REPO_ROOT" ]]; then args+=(--root "$REPO_ROOT"); fi
+if [[ -n "$REPO_CONFIG" ]]; then args+=(--repo-config "$REPO_CONFIG"); fi
+if [[ -n "$POLICY" && -s "$POLICY" ]]; then args+=(--policy "$POLICY"); fi
+if [[ -n "$FIXTURE" ]]; then args+=(--fixture "$FIXTURE"); fi
+
+if ! bash "$CHECK" "${args[@]}"; then
+  echo "deny $REPO: PR budget exceeded" >&2
+  exit 1
+fi
+echo "allow $REPO"

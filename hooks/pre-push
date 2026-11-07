@@ -1,0 +1,102 @@
+#!/usr/bin/env bash
+# Local guard for gardusi-gustavo-bot: no force-push, branch deletion, tag changes, or a
+# second open pull request in the same repository.
+set -euo pipefail
+
+[[ "$(id -un)" == "kapetim" ]] || exit 0
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PR_LIMIT_BIN="${PR_LIMIT_BIN:-}"
+if [[ -z "$PR_LIMIT_BIN" ]]; then
+  if [[ -x "$SCRIPT_DIR/pr-limit.sh" ]]; then
+    PR_LIMIT_BIN="$SCRIPT_DIR/pr-limit.sh"
+  elif [[ -x "$SCRIPT_DIR/pr-limit" ]]; then
+    PR_LIMIT_BIN="$SCRIPT_DIR/pr-limit"
+  elif command -v pr-limit >/dev/null 2>&1; then
+    PR_LIMIT_BIN="$(command -v pr-limit)"
+  fi
+fi
+if [[ -z "$PR_LIMIT_BIN" || ! -x "$PR_LIMIT_BIN" ]]; then
+  echo "denied: PR review lock is not installed (pr-limit)" >&2
+  exit 1
+fi
+
+PR_SIZE_BIN="${PR_SIZE_BIN:-}"
+if [[ -z "$PR_SIZE_BIN" ]]; then
+  if [[ -x "$SCRIPT_DIR/pr-size.sh" ]]; then
+    PR_SIZE_BIN="$SCRIPT_DIR/pr-size.sh"
+  elif [[ -x "$SCRIPT_DIR/pr-size" ]]; then
+    PR_SIZE_BIN="$SCRIPT_DIR/pr-size"
+  elif command -v pr-size >/dev/null 2>&1; then
+    PR_SIZE_BIN="$(command -v pr-size)"
+  fi
+fi
+if [[ -z "$PR_SIZE_BIN" || ! -x "$PR_SIZE_BIN" ]]; then
+  echo "denied: PR size guard is not installed (pr-size)" >&2
+  exit 1
+fi
+
+remote_name="${1:-origin}"
+remote_url="${2:-}"
+if [[ -z "$remote_url" ]]; then
+  remote_url="$(git remote get-url "$remote_name" 2>/dev/null || true)"
+fi
+
+repo_path=""
+if [[ "$remote_url" == *gitea* || "$remote_url" == *127.0.0.1* || "$remote_url" == *localhost* ]]; then
+  repo_path="$(printf '%s' "$remote_url" | sed -E 's#^(ssh://[^/]+/|git@[^:]+:|https?://[^/]+/)##; s#\.git$##')"
+  [[ "$repo_path" =~ ^[^/]+/[^/]+$ ]] || {
+    echo "denied: cannot determine repository from $remote_url" >&2
+    exit 1
+  }
+fi
+
+if [[ -z "${GITEA_TOKEN:-}" ]]; then
+  for envfile in "$HOME/.config/opencode/gitea.env" /home/kapetim/.config/opencode/gitea.env; do
+    [[ -r "$envfile" ]] || continue
+    # shellcheck disable=SC1090
+    source "$envfile"
+    break
+  done
+fi
+
+# shellcheck disable=SC2034
+while read -r local_ref local_sha remote_ref remote_sha; do
+  [[ -n "$remote_ref" ]] || continue
+
+  if [[ "$local_sha" =~ ^0+$ ]]; then
+    echo "denied: deleting $remote_ref is a gardusi-gustavo action" >&2
+    exit 1
+  fi
+  if [[ "$remote_ref" == "refs/heads/main" ]]; then
+    echo "denied: push to main is a gardusi-gustavo action" >&2
+    exit 1
+  fi
+  if [[ "$remote_ref" == refs/tags/* ]]; then
+    echo "denied: tag changes are a gardusi-gustavo action" >&2
+    exit 1
+  fi
+
+  if [[ "$remote_ref" == refs/heads/* && -n "$repo_path" ]]; then
+    branch="${remote_ref#refs/heads/}"
+    if ! "$PR_LIMIT_BIN" check --repo "$repo_path" --branch "$branch" >/dev/null; then
+      exit 1
+    fi
+    if ! "$PR_SIZE_BIN" check \
+      --repo "$repo_path" \
+      --branch "$branch" \
+      --head "$local_sha" \
+      --base origin/main \
+      --repo-root "$PWD" >/dev/null; then
+      exit 1
+    fi
+  fi
+
+  if [[ "$remote_sha" =~ ^0+$ ]]; then
+    continue
+  fi
+  if ! git merge-base --is-ancestor "$remote_sha" "$local_sha" 2>/dev/null; then
+    echo "denied: non-fast-forward push to $remote_ref" >&2
+    exit 1
+  fi
+done

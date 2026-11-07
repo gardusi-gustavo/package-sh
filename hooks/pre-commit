@@ -1,0 +1,30 @@
+#!/usr/bin/env bash
+# Lightweight pre-commit checks for staged JSON and shell files.
+set -euo pipefail
+root="$(git rev-parse --show-toplevel)"
+cd "$root"
+staged="$(git diff --cached --name-only --diff-filter=ACMR)"
+[[ -n "$staged" ]] || exit 0
+
+fail=0
+while IFS= read -r f; do
+  [[ -f "$f" ]] || continue
+  case "$f" in
+    *.json)
+      if ! jq empty "$f" >/dev/null 2>&1; then
+        echo "pre-commit: invalid JSON: $f" >&2
+        fail=1
+      fi
+      ;;
+    *.sh)
+      if ! bash -n "$f" >/dev/null 2>&1; then
+        echo "pre-commit: shell syntax error: $f" >&2
+        fail=1
+      fi
+      if command -v shellcheck >/dev/null 2>&1; then
+        shellcheck -S warning "$f" || fail=1
+      fi
+      ;;
+  esac
+done <<< "$staged"
+exit "$fail"
