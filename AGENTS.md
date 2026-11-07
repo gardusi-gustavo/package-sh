@@ -15,7 +15,7 @@
 - Pin releases by tag and verify checksums.
 - Never put credentials in scripts, logs, or issues.
 - Changes go through a branch and a pull request.
-- `kapetim` authors and `kapetao` reviews and merges.
+- `gardusi-gustavo-bot` authors and `gardusi-gustavo` reviews and merges.
 
 ## Validation
 

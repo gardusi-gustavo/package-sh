@@ -42,8 +42,8 @@ CONFIG="$REPO/infra/config/repo.json"
 AGENTS="$REPO/AGENTS.md"
 
 if [[ "$MODE" == "apply" ]]; then
-  [[ "$(id -un)" == "kapetim" ]] || {
-    echo "error: --apply must run as kapetim (current: $(id -un))" >&2
+  [[ "$(id -un)" == "kapetim" || "$(id -un)" == "gardusi-gustavo-bot" ]] || {
+    echo "error: --apply must run as kapetim or gardusi-gustavo-bot (current: $(id -un))" >&2
     exit 2
   }
 fi

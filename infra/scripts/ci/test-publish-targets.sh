@@ -32,7 +32,7 @@ check_ok() {
     gemspec)
       printf 'Gem::Specification.new do |s|\nend\n' > "$dir/example.gemspec" ;;
     composer.json)
-      printf '{"name":"kapetim/kit"}\n' > "$dir/composer.json" ;;
+      printf '{"name":"gardusi-gustavo/kit"}\n' > "$dir/composer.json" ;;
   esac
   "$HELPER" --root "$dir" >/dev/null
 }
