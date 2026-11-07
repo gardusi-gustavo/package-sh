@@ -104,15 +104,9 @@ render_identity() {
   org="$(jq -r '.organization' "$CONFIG")"
   layer="$(jq -r '.layer' "$CONFIG")"
   repo_id="$org/$(jq -r '.name' "$CONFIG")"
-  if [[ "$repo_id" == "dashboards/toolkit" ]]; then
-    parent="none"
-    runtime="dashboards/ops"
-    central="$TEMPLATES/agents/agents-template.md"
-  else
-    parent="dashboards/toolkit"
-    runtime="dashboards/ops"
-    central="$TEMPLATES/agents/agents-template.md"
-  fi
+  parent="templates/md"
+  runtime="dashboards/devops"
+  central="$TEMPLATES/agents/agents-template.md"
   deps="$(jq -r '(.depends_on // []) | if length == 0 then "none" else join(", ") end' "$CONFIG")"
   consumers="$(jq -r '(.consumers // []) | if length == 0 then "none" else join(", ") end' "$CONFIG")"
   data="$(jq -r '.data_classification' "$CONFIG")"
