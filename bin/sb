@@ -2,8 +2,9 @@
 # Small package runner for the versioned shell-bash scripts.
 set -euo pipefail
 
-VERSION="${SB_VERSION:-0.1.0}"
-BASE_URL="${SB_BASE_URL:-http://gitea:3000/templates/sh}"
+VERSION="${SB_VERSION:-0.3.1}"
+GITEA_URL="${SB_GITEA_URL:-${GITEA_URL:-http://gitea:3000}}"
+BASE_URL="${SB_BASE_URL:-$GITEA_URL/templates/sh}"
 TAG="${SB_TAG:-v$VERSION}"
 CACHE="${XDG_CACHE_HOME:-$HOME/.cache}/sb/$VERSION"
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
