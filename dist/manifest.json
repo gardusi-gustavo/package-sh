@@ -1,5 +1,5 @@
 {
-  "version": "0.3.0",
+  "version": "0.3.1",
   "scripts": {
     "agents.sync-agents": {
       "path": "infra/scripts/agents/sync-agents.sh",
@@ -83,7 +83,7 @@
     },
     "ci.validate-repo": {
       "path": "infra/scripts/ci/validate-repo.sh",
-      "sha256": "23bacfe0e6ce8ac480ea520ea2164140cdd175f226575ff4b0d4240cdd329c92"
+      "sha256": "d77389c2714e9af41fb2dea2ec8cafeb639593b9b45f95d8a1766590541f42bf"
     },
     "ci.validate-risk": {
       "path": "infra/scripts/ci/validate-risk.sh",

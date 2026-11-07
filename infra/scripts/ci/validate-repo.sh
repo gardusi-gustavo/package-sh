@@ -113,7 +113,7 @@ while IFS= read -r f; do
 done < <(git ls-files 'infra/config/**' || true)
 
 while IFS= read -r f; do
-  case "$f" in *.md) ;; *) fail "docs/ must contain only Markdown: $f" ;; esac
+  case "$f" in *.md|docs/issues/*.json) ;; *) fail "docs/ must contain only Markdown or docs/issues JSON: $f" ;; esac
 done < <(git ls-files 'docs/**' || true)
 
 "$SCRIPT_DIR/validate-files.sh" --root . --config "$CONFIG"
