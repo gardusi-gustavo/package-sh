@@ -14,14 +14,130 @@ MANIFEST="${MANIFEST:-$CACHE/manifest.json}"
 
 usage() {
   cat <<'EOF'
-usage: sb <list|fetch|run|verify|version>
+usage: sb <list|fetch|run|verify|version|deps>
 
   list                 list available scripts
   fetch NAME           download and verify one script
   run NAME [-- ARGS]   download if needed, then run the script
   verify               verify downloaded scripts and the manifest
   version              print the runner version
+  deps install         install pinned template dependencies from repo.json
+  deps check           verify installed template dependencies
+  deps update [REPO]   bump one or all dependencies to the latest tag
+  deps list            list dependencies and installation state
 EOF
+}
+
+deps_root() { printf '%s\n' "${1:-.}"; }
+deps_tag() { local t="$1"; [[ "$t" == v* ]] && printf '%s\n' "$t" || printf 'v%s\n' "$t"; }
+deps_manifest_url() { printf '%s/%s/raw/tag/%s/dist/manifest.json\n' "$GITEA_URL" "$1" "$2"; }
+deps_file_url() { printf '%s/%s/raw/tag/%s/%s\n' "$GITEA_URL" "$1" "$2" "$3"; }
+
+deps_install_one() {
+  local root="$1" repo="$2" tag="$3" force="$4" variant="$5"
+  local cache manifest
+  cache="$CACHE/deps/${repo//\//_}/$tag"
+  manifest="$cache/manifest.json"
+  mkdir -p "$cache"
+  curl -fsSL "$(deps_manifest_url "$repo" "$tag")" -o "$manifest" || {
+    echo "deps: cannot fetch $repo@$tag manifest" >&2; return 1;
+  }
+  local source target sha dest
+  while IFS=$'\t' read -r source target sha; do
+    [[ -n "$source" && -n "$target" ]] || continue
+    dest="$root/$target"
+    mkdir -p "$(dirname "$dest")"
+    if [[ -s "$dest" ]] && [[ "$(sha256sum "$dest" | awk '{print $1}')" == "$sha" ]] && (( ! force )); then
+      continue
+    fi
+    curl -fsSL "$(deps_file_url "$repo" "$tag" "$source")" -o "$dest.tmp" || {
+      echo "deps: cannot fetch $repo@$tag:$source" >&2; rm -f "$dest.tmp"; return 1;
+    }
+    if [[ -n "$sha" ]] && ! printf '%s  %s\n' "$sha" "$dest.tmp" | sha256sum -c - >/dev/null; then
+      echo "deps: checksum failed $repo@$tag:$source" >&2; rm -f "$dest.tmp"; return 1;
+    fi
+    mv "$dest.tmp" "$dest"
+    [[ "$target" == .githooks/* || "$target" == bin/* ]] && chmod +x "$dest" || true
+  done < <(jq -r '.files // {} | to_entries[] | [.key, .value.target, .value.sha256] | @tsv' "$manifest")
+
+  if [[ -n "$variant" ]] && jq -e --arg v "$variant" '.variants[$v] // empty' "$manifest" >/dev/null; then
+    local out srcs src
+    while IFS=$'\t' read -r out srcs; do
+      [[ -n "$out" ]] || continue
+      : > "$root/$out.tmp"
+      for src in $srcs; do
+        curl -fsSL "$(deps_file_url "$repo" "$tag" "$src")" >> "$root/$out.tmp" || {
+          echo "deps: cannot fetch $repo@$tag:$src" >&2; rm -f "$root/$out.tmp"; return 1;
+        }
+      done
+      mv "$root/$out.tmp" "$root/$out"
+    done < <(jq -r --arg v "$variant" '.variants[$v] | to_entries[] | [.key, (.value|join(" "))] | @tsv' "$manifest")
+  fi
+}
+
+deps_install() {
+  local root="$1" force="$2" variant="$3" config repo tag
+  config="$root/infra/config/repo.json"
+  [[ -s "$config" ]] || { echo "deps: missing $config" >&2; return 2; }
+  while IFS=$'\t' read -r repo tag; do
+    [[ -n "$repo" && -n "$tag" ]] || continue
+    echo "deps: $repo@$(deps_tag "$tag")"
+    deps_install_one "$root" "$repo" "$(deps_tag "$tag")" "$force" "$variant" || return 1
+  done < <(jq -r '.dependencies // {} | to_entries[] | [.key, .value] | @tsv' "$config")
+}
+
+deps_check() {
+  local root="$1" variant="$2" config repo tag cache manifest source target sha dest fail=0
+  config="$root/infra/config/repo.json"
+  [[ -s "$config" ]] || { echo "deps: missing $config" >&2; return 2; }
+  while IFS=$'\t' read -r repo tag; do
+    [[ -n "$repo" && -n "$tag" ]] || continue
+    tag="$(deps_tag "$tag")"
+    cache="$CACHE/deps/${repo//\//_}/$tag"
+    manifest="$cache/manifest.json"
+    mkdir -p "$cache"
+    if [[ ! -s "$manifest" ]]; then
+      curl -fsSL "$(deps_manifest_url "$repo" "$tag")" -o "$manifest" || { echo "deps: cannot fetch $repo@$tag manifest" >&2; fail=1; continue; }
+    fi
+    while IFS=$'\t' read -r source target sha; do
+      dest="$root/$target"
+      if [[ ! -s "$dest" ]]; then
+        echo "deps: missing $target from $repo@$tag" >&2; fail=1; continue
+      fi
+      if [[ -n "$sha" ]] && [[ "$(sha256sum "$dest" | awk '{print $1}')" != "$sha" ]]; then
+        echo "deps: drift $target from $repo@$tag" >&2; fail=1
+      fi
+    done < <(jq -r '.files // {} | to_entries[] | [.key, .value.target, .value.sha256] | @tsv' "$manifest")
+  done < <(jq -r '.dependencies // {} | to_entries[] | [.key, .value] | @tsv' "$config")
+  (( fail == 0 )) && echo "deps: ok"
+  return "$fail"
+}
+
+deps_update() {
+  local root="$1" only="$2" config repo tag latest
+  config="$root/infra/config/repo.json"
+  [[ -s "$config" ]] || { echo "deps: missing $config" >&2; return 2; }
+  local tmp; tmp="$(mktemp)"
+  cp "$config" "$tmp"
+  while IFS=$'\t' read -r repo tag; do
+    [[ -n "$repo" ]] || continue
+    [[ -z "$only" || "$repo" == "$only" ]] || continue
+    latest="$(curl -fsSL "$GITEA_URL/api/v1/repos/$repo/tags?limit=1" | jq -r '.[0].name // empty')"
+    [[ -n "$latest" ]] || { echo "deps: no tags for $repo" >&2; continue; }
+    jq --arg r "$repo" --arg t "$latest" '.dependencies[$r] = $t' "$tmp" > "$tmp.next" && mv "$tmp.next" "$tmp"
+    echo "deps: $repo -> $latest"
+  done < <(jq -r '.dependencies // {} | to_entries[] | [.key, .value] | @tsv' "$config")
+  mv "$tmp" "$config"
+}
+
+deps_list() {
+  local root="$1" config repo tag latest
+  config="$root/infra/config/repo.json"
+  [[ -s "$config" ]] || { echo "deps: missing $config" >&2; return 2; }
+  jq -r '.dependencies // {} | to_entries[] | "\(.key)\t\(.value)"' "$config" | while IFS=$'\t' read -r repo tag; do
+    latest="$(curl -fsSL "$GITEA_URL/api/v1/repos/$repo/tags?limit=1" 2>/dev/null | jq -r '.[0].name // "?"')"
+    printf '%-24s %-10s latest=%s\n' "$repo" "$tag" "$latest"
+  done
 }
 
 ensure_manifest() {
@@ -96,6 +212,24 @@ case "$cmd" in
     echo "verify: ok" ;;
   version)
     echo "$VERSION" ;;
+  deps)
+    sub="${1:-}"; shift || true
+    ROOT="."; FORCE=0; VARIANT=""; ONLY=""
+    while [[ $# -gt 0 ]]; do
+      case "$1" in
+        --root) ROOT="$2"; shift 2 ;;
+        --force) FORCE=1; shift ;;
+        --variant) VARIANT="$2"; shift 2 ;;
+        *) ONLY="$1"; shift ;;
+      esac
+    done
+    case "$sub" in
+      install) deps_install "$ROOT" "$FORCE" "$VARIANT" ;;
+      check) deps_check "$ROOT" "$VARIANT" ;;
+      update) deps_update "$ROOT" "$ONLY" ;;
+      list) deps_list "$ROOT" ;;
+      *) echo "usage: sb deps <install|check|update|list> [--root PATH] [--force] [--variant NAME]" >&2; exit 2 ;;
+    esac ;;
   -h|--help|help|"")
     usage ;;
   *)
