@@ -1,5 +1,5 @@
 {
-  "version": "0.5.2",
+  "version": "0.6.0",
   "scripts": {
     "agents.sync-agents": {
       "path": "infra/scripts/agents/sync-agents.sh",
@@ -31,7 +31,7 @@
     },
     "ci.test-local-issues": {
       "path": "infra/scripts/ci/test-local-issues.sh",
-      "sha256": "73677c30b8739b6341063d09a005160d54700a35a972d2f289b12cc18909ef12"
+      "sha256": "ebc50d9b682adf9bba8b6c0d746247a00b873413b0b2f1a6d8a917c747245739"
     },
     "ci.test-publish-targets": {
       "path": "infra/scripts/ci/test-publish-targets.sh",
@@ -59,7 +59,7 @@
     },
     "ci.validate-local-issues": {
       "path": "infra/scripts/ci/validate-local-issues.sh",
-      "sha256": "99d5313be75c5f51346f378884de9259263c7cc2ec9782dc3b1cdfda15821866"
+      "sha256": "21f2a06d4bc3cc1c6a46c8d2c8f0636d4490d18a383d3a22cd1af7b2c3753f27"
     },
     "ci.validate-md-links": {
       "path": "infra/scripts/ci/validate-md-links.sh",

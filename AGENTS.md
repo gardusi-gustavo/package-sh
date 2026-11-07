@@ -23,3 +23,17 @@
 shellcheck infra/scripts/**/*.sh infra/scripts/*.sh
 bash infra/scripts/ci/test-repo-contract.sh
 ```
+
+## Local tasks
+
+- Tasks live in `docs/issues/` as one JSON file per task.
+- Append tasks; do not create native issues for agent work.
+- Rank: `3.x` bugs, `2.x` documentation/chores, `1.x` features/refactors.
+  Higher fraction = more important.
+- Filename: `<rank>-<slug>.json`; no trailing zero; one to six fractional digits.
+- The file is the task. There is no author, source, platform, or status field.
+- Pick the highest-ranked task; one work PR per repository.
+- The PR references the task and deletes the file:
+  `Task: docs/issues/<file>.json`.
+- Merge completes the task. Git history keeps the record.
+- On a failed PR, append an attempt to the task file, close the PR, and keep the file.

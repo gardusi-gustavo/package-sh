@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Validate local issue records in docs/issues.
+# Validate append-only task files in docs/issues.
 set -euo pipefail
 
 ROOT="."
@@ -19,13 +19,12 @@ done
 [[ -d "$ROOT" ]] || { echo "error: root not found: $ROOT" >&2; exit 2; }
 DIR="$ROOT/docs/issues"
 if [[ ! -d "$DIR" ]]; then
-  echo "local issues: none"
+  echo "local tasks: none"
   exit 0
 fi
 
 errors=0
 fail() { echo "ERROR: $*" >&2; errors=$((errors + 1)); }
-active=0
 count=0
 declare -A seen=()
 
@@ -37,8 +36,8 @@ while IFS= read -r file; do
   esac
   count=$((count + 1))
 
-  if [[ ! "$base" =~ ^([123])\.([0-9]{1,6})-([a-z0-9-]+)\.json$ ]]; then
-    fail "$base: filename must match <3|2|1>.<1-6 digits>-<slug>.json"
+  if [[ ! "$base" =~ ^([123])\.([0-9]{1,6})-([a-z0-9]+(-[a-z0-9]+)*)\.json$ ]]; then
+    fail "$base: filename must match <1|2|3>.<1-6 digits>-<slug>.json"
     continue
   fi
   prefix="${BASH_REMATCH[1]}.${BASH_REMATCH[2]}"
@@ -47,50 +46,28 @@ while IFS= read -r file; do
 
   jq empty "$file" >/dev/null 2>&1 || { fail "$base: invalid JSON"; continue; }
 
-  id="$(jq -r '.id // empty' "$file")"
   rank="$(jq -r '.rank // empty' "$file")"
-  type="$(jq -r '.type // empty' "$file")"
-  status="$(jq -r '.status // empty' "$file")"
-  [[ "$id" == "$prefix" ]] || fail "$base: id must be $prefix"
   [[ "$rank" == "$prefix" ]] || fail "$base: rank must be $prefix"
   [[ -n "${seen[$rank]:-}" ]] && fail "$base: duplicate rank $rank"
   seen[$rank]=1
 
-  case "$prefix" in
-    3.*) expected="bug" ;;
-    2.*) expected="documentation" ;;
-    1.*) expected="enhancement" ;;
-  esac
-  [[ "$type" == "$expected" ]] || fail "$base: type must be $expected for rank $prefix"
+  extra="$(jq -r '[keys[] | select(. != "rank" and . != "title" and . != "context" and . != "limits" and . != "spec" and . != "attempts")] | join(", ")' "$file")"
+  [[ -z "$extra" ]] || fail "$base: unknown top-level fields: $extra"
 
-  case "$status" in
-    backlog|active|blocked) ;;
-    *) fail "$base: status must be backlog, active, or blocked" ;;
-  esac
-
-  jq -e '.source | type == "string" and length > 0' "$file" >/dev/null || fail "$base: source is required"
-  jq -e '.author | type == "string" and length > 0' "$file" >/dev/null || fail "$base: author is required"
-  jq -e '.created | type == "string" and test("^[0-9]{4}-[0-9]{2}-[0-9]{2}$")' "$file" >/dev/null || fail "$base: created must be YYYY-MM-DD"
-  jq -e '.attempts | type == "array"' "$file" >/dev/null || fail "$base: attempts must be an array"
+  jq -e '.title | type == "string" and length > 0' "$file" >/dev/null || fail "$base: title is required"
+  jq -e '.context | type == "string" and length > 0' "$file" >/dev/null || fail "$base: context is required"
+  jq -e '.limits | type == "object" and ((keys | sort) == ["max_commits","max_file_changes"])' "$file" >/dev/null || fail "$base: limits must contain only max_commits and max_file_changes"
   jq -e '.limits.max_commits | type == "number" and . >= 1 and floor == .' "$file" >/dev/null || fail "$base: limits.max_commits must be a positive integer"
   jq -e '.limits.max_file_changes | type == "number" and . >= 1 and floor == .' "$file" >/dev/null || fail "$base: limits.max_file_changes must be a positive integer"
-  jq -e '.spec | type == "object"' "$file" >/dev/null || fail "$base: spec is required"
+  jq -e '.spec | type == "object" and ((keys | sort) == ["acceptance_criteria","expected_outcome","summary"])' "$file" >/dev/null || fail "$base: spec must contain only summary, expected_outcome, and acceptance_criteria"
   jq -e '.spec.summary | type == "string" and length > 0' "$file" >/dev/null || fail "$base: spec.summary is required"
-  jq -e '.spec.acceptance_criteria | type == "array" and length > 0' "$file" >/dev/null || fail "$base: spec.acceptance_criteria is required"
-  jq -e 'if has("tags") then (.tags | type == "array") else true end' "$file" >/dev/null || fail "$base: tags must be an array"
-
-  if [[ "$status" == "active" ]]; then
-    active=$((active + 1))
-    jq -e '.platform_issue_id | type == "number" and . >= 1 and floor == .' "$file" >/dev/null || fail "$base: active issue requires platform_issue_id"
-    jq -e '.platform_issue_url | type == "string" and length > 0' "$file" >/dev/null || fail "$base: active issue requires platform_issue_url"
-  else
-    jq -e '(.platform_issue_id // null) == null' "$file" >/dev/null || fail "$base: only an active issue may have platform_issue_id"
-  fi
+  jq -e '.spec.expected_outcome | type == "string" and length > 0' "$file" >/dev/null || fail "$base: spec.expected_outcome is required"
+  jq -e '.spec.acceptance_criteria | type == "array" and length > 0 and all(.[]; type == "string" and length > 0)' "$file" >/dev/null || fail "$base: spec.acceptance_criteria must be a non-empty array of strings"
+  jq -e 'if has("attempts") then (.attempts | type == "array" and all(.[]; type == "object" and ((keys - ["summary","next_step"]) | length == 0) and (.summary | type == "string" and length > 0))) else true end' "$file" >/dev/null || fail "$base: attempts must be an array of {summary, next_step?}"
 
   lines="$(wc -l < "$file")"
   (( lines <= 300 )) || fail "$base: file exceeds 300 lines"
 done < <(find "$DIR" -maxdepth 1 -type f -name '*.json' | sort)
 
-(( active <= 1 )) || fail "more than one active issue"
 (( errors == 0 )) || exit 1
-echo "local issues: ok ($count files, $active active)"
+echo "local tasks: ok ($count files)"

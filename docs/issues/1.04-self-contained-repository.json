@@ -1,28 +1,19 @@
 {
-  "id": "1.04",
   "rank": "1.04",
-  "type": "enhancement",
-  "title": "1.04 - Make shell-bash self-contained",
-  "status": "backlog",
-  "source": "agent",
-  "author": "gardusi-gustavo-bot",
-  "created": "2026-11-07",
-  "platform": "gitea",
-  "platform_issue_id": null,
-  "platform_issue_url": null,
+  "title": "Make shell-bash self-contained",
+  "context": "Durable shell-bash data must live in the repository so a clone or archive is enough to rebuild and operate it.",
   "limits": {
     "max_commits": 5,
     "max_file_changes": 4
   },
-  "attempts": [],
-  "tags": ["repository", "self-contained"],
   "spec": {
     "summary": "Complete the repository self-containment checklist.",
     "expected_outcome": "All durable shell-bash data is inside the repository; external dependencies are documented.",
     "acceptance_criteria": [
       "docs/repository/self-contained.md matches the actual state",
-      "Local issue validation runs in self-test",
+      "Local task validation runs in self-test",
       "External-only data is classified"
     ]
-  }
+  },
+  "attempts": []
 }
