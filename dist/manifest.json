@@ -1,9 +1,9 @@
 {
-  "version": "0.6.0",
+  "version": "0.6.1",
   "scripts": {
     "agents.sync-agents": {
       "path": "infra/scripts/agents/sync-agents.sh",
-      "sha256": "f8b8d2bf94be52558e39808af75b3cb271284f795366688a6a0e7aa6f578d161"
+      "sha256": "8320a40b673b1ce0fde62bb87b83a3e20936c085a0f143c8379d36ced21f7618"
     },
     "check-layout": {
       "path": "infra/scripts/check-layout.sh",

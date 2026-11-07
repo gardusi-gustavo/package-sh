@@ -106,7 +106,7 @@ render_identity() {
   repo_id="$org/$(jq -r '.name' "$CONFIG")"
   parent="templates/md"
   runtime="dashboards/devops"
-  central="$TEMPLATES/agents/agents-template.md"
+  central="infra/templates/md/docs/agents/README.md"
   deps="$(jq -r '(.depends_on // []) | if length == 0 then "none" else join(", ") end' "$CONFIG")"
   consumers="$(jq -r '(.consumers // []) | if length == 0 then "none" else join(", ") end' "$CONFIG")"
   data="$(jq -r '.data_classification' "$CONFIG")"
@@ -130,7 +130,7 @@ EOF
 }
 
 blocks=(operating-model issue-workflow decision-records dependency-reading scripts)
-optional_blocks=(knowledge-mode coverage self-improvement docs-links)
+optional_blocks=(knowledge-mode coverage self-improvement local-issues docs-links)
 errors=0
 
 check_markers() {
@@ -181,7 +181,7 @@ check_block() {
 
 check_order() {
   local order name last=0 line
-  order=(repository-identity operating-model issue-workflow decision-records dependency-reading knowledge-mode coverage self-improvement scripts)
+  order=(repository-identity operating-model issue-workflow decision-records dependency-reading knowledge-mode coverage self-improvement local-issues scripts)
   for name in "${order[@]}"; do
     line="$(grep -nxF "<!-- begin $name -->" "$AGENTS" | cut -d: -f1 || true)"
     if [[ -z "$line" ]]; then
