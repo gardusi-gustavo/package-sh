@@ -85,7 +85,7 @@ deps_install() {
     echo "deps: $repo@$(deps_tag "$tag")"
     deps_install_one "$root" "$repo" "$(deps_tag "$tag")" "$force" "$variant" || return 1
   done < <(jq -r '.dependencies // {} | to_entries[] | [.key, .value] | @tsv' "$config")
-  if [[ -d "$root/.githooks" ]]; then
+  if [[ -d "$root/.githooks" ]] && git -C "$root" rev-parse --git-dir >/dev/null 2>&1; then
     git -C "$root" config core.hooksPath .githooks || true
   fi
 }

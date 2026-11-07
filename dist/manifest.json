@@ -1,5 +1,5 @@
 {
-  "version": "0.4.5",
+  "version": "0.4.6",
   "scripts": {
     "agents.sync-agents": {
       "path": "infra/scripts/agents/sync-agents.sh",
@@ -157,7 +157,7 @@
     },
     "bin/sb": {
       "target": "bin/sb",
-      "sha256": "ba490e0e8f588c01e62e49ed60f54a24b78f31fec5162377d0cfc77371f30346"
+      "sha256": "3b0de9d05277ff5f2bb47d32c4268ee6f47c9c75518a63e9819e2094f4d09d72"
     }
   }
 }
