@@ -7,7 +7,7 @@ recoverable, and copyable without Gitea.
 
 - Repository: `templates/sh`
 - Visibility: public
-- Owner: `gardusi-gustavo`
+- Owner: `human`
 - Git platform: Gitea
 - Local checkout: `~/repos/templates/sh`
 

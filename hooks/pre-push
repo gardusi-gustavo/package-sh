@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
-# Local guard for gardusi-gustavo-bot: no force-push, branch deletion, tag changes, or a
+# Local guard for gitea-automation: no force-push, branch deletion, tag changes, or a
 # second open pull request in the same repository.
 set -euo pipefail
 
-[[ "$(id -un)" == "kapetim" ]] || exit 0
+[[ "$(id -un)" == "gitea-automation" ]] || exit 0
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PR_LIMIT_BIN="${PR_LIMIT_BIN:-}"
@@ -52,7 +52,7 @@ if [[ "$remote_url" == *gitea* || "$remote_url" == *127.0.0.1* || "$remote_url" 
 fi
 
 if [[ -z "${GITEA_TOKEN:-}" ]]; then
-  for envfile in "$HOME/.config/opencode/gitea.env" /home/kapetim/.config/opencode/gitea.env; do
+  for envfile in "$HOME/.config/opencode/gitea.env" /home/user/.config/opencode/gitea.env; do
     [[ -r "$envfile" ]] || continue
     # shellcheck disable=SC1090
     source "$envfile"
@@ -65,15 +65,15 @@ while read -r local_ref local_sha remote_ref remote_sha; do
   [[ -n "$remote_ref" ]] || continue
 
   if [[ "$local_sha" =~ ^0+$ ]]; then
-    echo "denied: deleting $remote_ref is a gardusi-gustavo action" >&2
+    echo "denied: deleting $remote_ref is a gitea-automation action" >&2
     exit 1
   fi
   if [[ "$remote_ref" == "refs/heads/main" ]]; then
-    echo "denied: push to main is a gardusi-gustavo action" >&2
+    echo "denied: push to main is a gitea-automation action" >&2
     exit 1
   fi
   if [[ "$remote_ref" == refs/tags/* ]]; then
-    echo "denied: tag changes are a gardusi-gustavo action" >&2
+    echo "denied: tag changes are a gitea-automation action" >&2
     exit 1
   fi
 

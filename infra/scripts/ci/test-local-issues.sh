@@ -32,7 +32,7 @@ if "$HELPER" --root "$mismatch" >/dev/null 2>&1; then echo "error: rank mismatch
 context="$tmp/context"; make_task "$context" 3.9-a.json 3.9; jq 'del(.context)' "$context/docs/issues/3.9-a.json" > "$tmp/x" && mv "$tmp/x" "$context/docs/issues/3.9-a.json"
 if "$HELPER" --root "$context" >/dev/null 2>&1; then echo "error: missing context passed" >&2; exit 1; fi
 
-legacy="$tmp/legacy"; make_task "$legacy" 3.9-a.json 3.9; jq '.author="gardusi-gustavo-bot" | .status="backlog"' "$legacy/docs/issues/3.9-a.json" > "$tmp/x" && mv "$tmp/x" "$legacy/docs/issues/3.9-a.json"
+legacy="$tmp/legacy"; make_task "$legacy" 3.9-a.json 3.9; jq '.author="bot-event" | .status="backlog"' "$legacy/docs/issues/3.9-a.json" > "$tmp/x" && mv "$tmp/x" "$legacy/docs/issues/3.9-a.json"
 if "$HELPER" --root "$legacy" >/dev/null 2>&1; then echo "error: legacy fields passed" >&2; exit 1; fi
 
 attempt="$tmp/attempt"; make_task "$attempt" 3.9-a.json 3.9; jq '.attempts=[{summary:"Tried it",next_step:"Retry"}]' "$attempt/docs/issues/3.9-a.json" > "$tmp/x" && mv "$tmp/x" "$attempt/docs/issues/3.9-a.json"
