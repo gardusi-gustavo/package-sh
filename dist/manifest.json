@@ -1,9 +1,9 @@
 {
-  "version": "0.6.1",
+  "version": "0.6.2",
   "scripts": {
     "agents.sync-agents": {
       "path": "infra/scripts/agents/sync-agents.sh",
-      "sha256": "8320a40b673b1ce0fde62bb87b83a3e20936c085a0f143c8379d36ced21f7618"
+      "sha256": "eeac32eb39cb999a62154b977aab38db1f954cc59cc85f98ec1d68a143840a57"
     },
     "check-layout": {
       "path": "infra/scripts/check-layout.sh",
@@ -31,7 +31,7 @@
     },
     "ci.test-local-issues": {
       "path": "infra/scripts/ci/test-local-issues.sh",
-      "sha256": "ebc50d9b682adf9bba8b6c0d746247a00b873413b0b2f1a6d8a917c747245739"
+      "sha256": "382e71d271df757a73553636b784aa7e4f0250b9e694a28a74fd2fbc904dd5b9"
     },
     "ci.test-publish-targets": {
       "path": "infra/scripts/ci/test-publish-targets.sh",
@@ -67,7 +67,7 @@
     },
     "ci.validate-pr-count": {
       "path": "infra/scripts/ci/validate-pr-count.sh",
-      "sha256": "b578de8ec612fa192f96fdceeaf48242f120e59fcf01a03a623be32d18b2cfc6"
+      "sha256": "b7d6812c5279d36ead8bb86d961ed711df74fd976607f9ea02283bbe4eeb72a0"
     },
     "ci.validate-pr-size": {
       "path": "infra/scripts/ci/validate-pr-size.sh",
@@ -103,7 +103,7 @@
     },
     "release": {
       "path": "infra/scripts/release.sh",
-      "sha256": "90285ffcae4e7b7420ce5256c627cad4b01e713de553c6728814c4d369ccb6cc"
+      "sha256": "e6ff3f4090a22914a82c36eccfd9c203f95eb97951c2825e883b1096e0c14068"
     },
     "render-ci-profile": {
       "path": "infra/scripts/render-ci-profile.sh",
@@ -233,7 +233,7 @@
     },
     "hooks/pre-push": {
       "target": ".githooks/pre-push",
-      "sha256": "4ad887c1ad05a3abdcfda8cf18841a10993b3f606eb4643fceec624d8a2c91bf"
+      "sha256": "458ada81bc3a6ef6d93a1ab8a77951f40804c5be3e3a1d12d8f83518708fae44"
     },
     "hooks/pre-commit": {
       "target": ".githooks/pre-commit",
@@ -241,7 +241,7 @@
     },
     "scripts/pr-limit": {
       "target": ".githooks/pr-limit",
-      "sha256": "daa31bc8225e58787eb770e39fe4b1925278e6ae6d02562f058595c1878b94da"
+      "sha256": "741cf7e0c314a311792e215425c599d6c46cb08bf68d4824032cddc5a8ec6138"
     },
     "scripts/pr-size": {
       "target": ".githooks/pr-size",
