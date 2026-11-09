@@ -4,7 +4,11 @@ set -euo pipefail
 
 VERSION="${SB_VERSION:-0.3.1}"
 GITEA_URL="${SB_GITEA_URL:-${GITEA_URL:-http://gitea:3000}}"
-BASE_URL="${SB_BASE_URL:-$GITEA_URL/templates/sh}"
+if [[ -n "${GITHUB_ACTIONS:-}" ]]; then
+  BASE_URL="${SB_BASE_URL:-https://raw.githubusercontent.com/gardusi-gustavo/package-sh}"
+else
+  BASE_URL="${SB_BASE_URL:-$GITEA_URL/gardusi-gustavo/package-sh}"
+fi
 TAG="${SB_TAG:-v$VERSION}"
 CACHE="${XDG_CACHE_HOME:-$HOME/.cache}/sb/$VERSION"
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -145,10 +149,19 @@ deps_list() {
   done
 }
 
+asset_url() {
+  local path="$1"
+  if [[ -n "${GITHUB_ACTIONS:-}" ]]; then
+    printf '%s/%s/%s\n' "${SB_RAW_URL:-https://raw.githubusercontent.com/gardusi-gustavo/package-sh}" "$TAG" "$path"
+  else
+    printf '%s/raw/tag/%s/%s\n' "$BASE_URL" "$TAG" "$path"
+  fi
+}
+
 ensure_manifest() {
   [[ -s "$MANIFEST" ]] && return
   mkdir -p "$CACHE"
-  curl -fsSL "$BASE_URL/raw/tag/$TAG/dist/manifest.json" -o "$MANIFEST"
+  curl -fsSL "$(asset_url dist/manifest.json)" -o "$MANIFEST"
 }
 
 script_path() {
@@ -167,7 +180,7 @@ fetch_script() {
   dest="$CACHE/$path"
   mkdir -p "$(dirname "$dest")"
   if [[ ! -s "$dest" ]]; then
-    curl -fsSL "$BASE_URL/raw/tag/$TAG/$path" -o "$dest"
+    curl -fsSL "$(asset_url "$path")" -o "$dest"
   fi
   printf '%s  %s\n' "$sha" "$dest" | sha256sum -c - >/dev/null || {
     echo "checksum failed: $name" >&2

@@ -1,12 +1,13 @@
 {
   "schema": 1,
-  "name": "sh",
-  "organization": "templates",
+  "name": "package-sh",
+  "organization": "gardusi-gustavo",
   "layer": 1,
   "kind": "template",
   "visibility": "public",
   "platforms": [
-    "gitea"
+    "gitea",
+    "github"
   ],
   "features": {
     "ci": true,
@@ -36,5 +37,31 @@
   "dependencies": {},
   "depends_on": [],
   "consumers": [],
-  "data_classification": "public"
+  "data_classification": "public",
+  "files": {
+    "rules": {
+      ".github/": {
+        "allow_globs": [
+          "*"
+        ],
+        "allow_names": [
+          "CODEOWNERS"
+        ]
+      },
+      ".github/workflows/": {
+        "allow_extensions": [
+          ".yml",
+          ".yaml"
+        ]
+      },
+      ".github/ISSUE_TEMPLATE/": {
+        "allow_extensions": [
+          ".yml",
+          ".yaml",
+          ".md"
+        ]
+      }
+    },
+    "forbid": []
+  }
 }

@@ -35,14 +35,14 @@ for f in README.md infra/config/repo.json; do
   [[ -s "$f" ]] || fail "missing required file: $f"
 done
 
-for old in config docker data scripts .github .gitlab-ci.yml; do
+for old in config docker data scripts .gitlab-ci.yml; do
   [[ -e "$old" ]] && fail "old root path still present: $old"
 done
 [[ -e infra/data ]] && fail "infra/data is retired; use src/data"
 [[ -e infra/README.md ]] && fail "Move infra/README.md to docs/"
 
 
-allowed="src infra docs templates .gitea"
+allowed="src infra docs templates .gitea .github"
 while IFS= read -r top; do
   [[ -n "$top" ]] || continue
   case " $allowed " in

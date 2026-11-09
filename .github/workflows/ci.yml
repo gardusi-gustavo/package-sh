@@ -1,0 +1,15 @@
+name: ci
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+permissions:
+  contents: read
+jobs:
+  ci:
+    uses: gardusi-gustavo/devops/.github/workflows/ci-shell.yml@main
+    with:
+      command: |
+        for f in $(git ls-files '*.sh'); do bash -n "$f"; done
+        bash -n bin/sb

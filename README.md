@@ -8,7 +8,7 @@ Pin a tag. Do not use `main`.
 
 ```bash
 curl -fsSL \
-  "http://gitea:3000/templates/sh/raw/tag/v0.3.1/bin/sb" \
+  "https://raw.githubusercontent.com/gardusi-gustavo/package-sh/v0.6.3/bin/sb" \
   -o /tmp/sb
 chmod +x /tmp/sb
 /tmp/sb verify
@@ -23,7 +23,7 @@ chmod +x /tmp/sb
 ```
 
 Scripts receive configuration through arguments and the environment. They do
-not source files from `templates/md`.
+not source files from `package-sh`.
 
 ## Dependencies
 
@@ -48,5 +48,5 @@ dist/manifest.json        script paths and checksums
 
 ## Release
 
-A release is a Git tag plus a Gitea release containing the repository archive
+A release is a Git tag plus a GitHub release containing the repository archive
 and `dist/manifest.json`. Consumers pin the tag and verify checksums.

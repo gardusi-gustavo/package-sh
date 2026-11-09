@@ -1,0 +1,23 @@
+name: Feature request
+description: Propose a new capability or change.
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposal
+    validations:
+      required: true
+  - type: textarea
+    id: security
+    attributes:
+      label: Security and data impact
+      description: State whether this touches secrets, personal data, or public data.
+    validations:
+      required: true
