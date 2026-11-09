@@ -7,6 +7,7 @@ ROOT="${BUNDLE_BACKUP_ROOT:-/srv/backup/git-bundles}"
 ORDER="${BUNDLE_ORDER:-}"
 SOURCE_ROOT="${BUNDLE_SOURCE_ROOT:-/srv/gitea/data/git/repositories}"
 PROFILE_SOURCE="${BUNDLE_PROFILE_SOURCE:-/home/user/repos/gardusi-gustavo/gardusi-gustavo}"
+LOCAL_CLONE_ROOT="${BUNDLE_LOCAL_CLONE_ROOT:-/home/user/repos}"
 MODE="local"
 MAX_SNAPSHOTS="${BUNDLE_MAX_SNAPSHOTS:-5}"
 PASSFILE="${BACKUP_PASSPHRASE_FILE:-/srv/backup/secrets/backup.pass}"
@@ -22,6 +23,7 @@ usage: bundle-all.sh [options]
   --github              bundle from GitHub HTTPS instead of local bare repos
   --source-root DIR     local bare repository root
   --profile-source DIR  local profile repository
+  --local-clone-root DIR  fallback root for GitHub-only repositories
   --root DIR            bundle destination root
   --max-snapshots N     snapshots kept per repository
   --encrypt-private     encrypt the private repository bundle
@@ -38,6 +40,7 @@ while [[ $# -gt 0 ]]; do
     --github) MODE="github"; shift ;;
     --source-root) SOURCE_ROOT="${2:-}"; shift 2 ;;
     --profile-source) PROFILE_SOURCE="${2:-}"; shift 2 ;;
+    --local-clone-root) LOCAL_CLONE_ROOT="${2:-}"; shift 2 ;;
     --root) ROOT="${2:-}"; shift 2 ;;
     --max-snapshots) MAX_SNAPSHOTS="${2:-}"; shift 2 ;;
     --encrypt-private) ENCRYPT_PRIVATE=1; shift ;;
@@ -62,6 +65,10 @@ run_one() {
       source="$PROFILE_SOURCE"
     elif [[ "$repo" == "gardusi-gustavo/private" ]]; then
       source="$SOURCE_ROOT/human/private.git"
+    elif [[ -d "$SOURCE_ROOT/$repo.git" ]]; then
+      source="$SOURCE_ROOT/$repo.git"
+    elif [[ -d "$LOCAL_CLONE_ROOT/$repo/.git" ]]; then
+      source="$LOCAL_CLONE_ROOT/$repo"
     else
       source="$SOURCE_ROOT/$repo.git"
     fi

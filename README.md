@@ -8,7 +8,7 @@ Pin a tag. Do not use `main`.
 
 ```bash
 curl -fsSL \
-  "https://raw.githubusercontent.com/gardusi-gustavo/package-sh/v0.7.2/bin/sb" \
+  "https://raw.githubusercontent.com/gardusi-gustavo/package-sh/v0.7.3/bin/sb" \
   -o /tmp/sb
 chmod +x /tmp/sb
 /tmp/sb verify

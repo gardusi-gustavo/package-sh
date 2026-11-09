@@ -1,5 +1,5 @@
 {
-  "version": "0.7.2",
+  "version": "0.7.3",
   "scripts": {
     "agents.sync-agents": {
       "path": "infra/scripts/agents/sync-agents.sh",
@@ -243,7 +243,7 @@
     },
     "backup.bundle-all": {
       "path": "infra/scripts/backup/bundle-all.sh",
-      "sha256": "85bd578d52f202fabd7e52558fc1085b9806b5510403360d413696b43772e333"
+      "sha256": "7168456bbeb934c75379c46535d1efbcbf2e4bb133af24d026511c651d57f3e3"
     }
   },
   "files": {
