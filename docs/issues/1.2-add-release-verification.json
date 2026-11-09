@@ -1,0 +1,18 @@
+{
+  "rank": "1.2",
+  "title": "Add release verification",
+  "context": "Consumers cannot verify a tag end to end.",
+  "limits": {
+    "max_commits": 5,
+    "max_file_changes": 4
+  },
+  "spec": {
+    "summary": "Add a verify-tag command.",
+    "expected_outcome": "A consumer can verify the manifest and scripts.",
+    "acceptance_criteria": [
+      "Tag is checked",
+      "Checksums are checked"
+    ]
+  },
+  "attempts": []
+}

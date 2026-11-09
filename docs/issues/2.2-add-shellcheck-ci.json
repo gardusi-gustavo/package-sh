@@ -1,0 +1,18 @@
+{
+  "rank": "2.2",
+  "title": "Add shellcheck CI",
+  "context": "Shell syntax is checked but shellcheck is not.",
+  "limits": {
+    "max_commits": 5,
+    "max_file_changes": 4
+  },
+  "spec": {
+    "summary": "Add shellcheck to the reusable CI.",
+    "expected_outcome": "Shell scripts are linted.",
+    "acceptance_criteria": [
+      "Shellcheck runs on PRs",
+      "False positives are documented"
+    ]
+  },
+  "attempts": []
+}

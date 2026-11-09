@@ -1,0 +1,18 @@
+{
+  "rank": "1.1",
+  "title": "Refresh the release manifest",
+  "context": "The manifest must match the tagged scripts.",
+  "limits": {
+    "max_commits": 5,
+    "max_file_changes": 4
+  },
+  "spec": {
+    "summary": "Regenerate checksums at release time.",
+    "expected_outcome": "A tag produces a verifiable manifest.",
+    "acceptance_criteria": [
+      "Every script has a SHA256",
+      "Manifest version matches VERSION"
+    ]
+  },
+  "attempts": []
+}

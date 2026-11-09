@@ -1,0 +1,18 @@
+{
+  "rank": "2.1",
+  "title": "Document pinned consumption",
+  "context": "Consumers need one page for tag and checksum use.",
+  "limits": {
+    "max_commits": 5,
+    "max_file_changes": 4
+  },
+  "spec": {
+    "summary": "Document the pinned-tag contract.",
+    "expected_outcome": "A consumer can install without main.",
+    "acceptance_criteria": [
+      "Install example is current",
+      "Checksum step is explicit"
+    ]
+  },
+  "attempts": []
+}

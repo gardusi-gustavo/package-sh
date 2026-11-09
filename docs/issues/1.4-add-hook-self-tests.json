@@ -1,0 +1,18 @@
+{
+  "rank": "1.4",
+  "title": "Add hook self-tests",
+  "context": "Hooks are not covered by CI.",
+  "limits": {
+    "max_commits": 5,
+    "max_file_changes": 4
+  },
+  "spec": {
+    "summary": "Add tests for commit-msg, pre-commit, and pre-push.",
+    "expected_outcome": "Hook behavior is regression-tested.",
+    "acceptance_criteria": [
+      "Tests run in CI",
+      "Failure cases are covered"
+    ]
+  },
+  "attempts": []
+}
