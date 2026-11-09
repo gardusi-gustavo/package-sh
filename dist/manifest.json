@@ -261,7 +261,7 @@
     },
     "bin/sb": {
       "target": "bin/sb",
-      "sha256": "4400e192d0c3726e3ba743b38754346142fd93ff8ec9517c6b25ab4b892482f9"
+      "sha256": "3f77df1110962f5d2e88b4b53a7a2be2b32522097f8cd70ede912e9e77b18b00"
     }
   }
 }
