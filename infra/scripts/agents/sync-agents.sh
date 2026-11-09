@@ -105,7 +105,7 @@ render_identity() {
   layer="$(jq -r '.layer' "$CONFIG")"
   repo_id="$org/$(jq -r '.name' "$CONFIG")"
   parent="templates/md"
-  runtime="dashboards/devops"
+  runtime="gardusi-gustavo/workflow-devops"
   central="infra/templates/md/docs/agents/README.md"
   deps="$(jq -r '(.depends_on // []) | if length == 0 then "none" else join(", ") end' "$CONFIG")"
   consumers="$(jq -r '(.consumers // []) | if length == 0 then "none" else join(", ") end' "$CONFIG")"

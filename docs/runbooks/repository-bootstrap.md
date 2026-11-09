@@ -1,7 +1,7 @@
 # Repository bootstrap
 
 Status: **staged locally**. GitHub-side rulesets and secret scanning are applied
-by `devops/infra/scripts/github/bootstrap.sh` after the mirror exists.
+by `workflow-devops/infra/scripts/github/bootstrap.sh` after the mirror exists.
 
 ## Baseline
 

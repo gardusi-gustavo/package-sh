@@ -7,7 +7,7 @@ sync metadata.
 
 The schema and template in this directory are authoritative for this
 repository. The canonical lifecycle and cross-repository standards live in
-`gardusi-gustavo/devops` under `docs/issues/`.
+`gardusi-gustavo/workflow-devops` under `docs/issues/`.
 
 - Filename: `<rank>-<slug>.json`; one to six fractional digits, no trailing zero.
 - Rank: `3.x` bug, `2.x` documentation or chore, `1.x` feature or refactor.

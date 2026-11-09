@@ -9,5 +9,5 @@ permissions:
 
 jobs:
   agent:
-    uses: gardusi-gustavo/devops/.github/workflows/agent.yml@v0.1.0
+    uses: gardusi-gustavo/workflow-devops/.github/workflows/agent.yml@v0.1.0
     secrets: inherit

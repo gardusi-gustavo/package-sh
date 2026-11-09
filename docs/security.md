@@ -2,7 +2,7 @@
 
 ## Reporting
 
-Use GitHub private vulnerability reporting for `gardusi-gustavo/devops`.
+Use GitHub private vulnerability reporting for `gardusi-gustavo/workflow-devops`.
 Do not open a public issue for a secret exposure.
 
 ## Rules
