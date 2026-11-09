@@ -8,7 +8,7 @@ permissions:
   contents: read
 jobs:
   ci:
-    uses: gardusi-gustavo/devops/.github/workflows/ci-shell.yml@main
+    uses: gardusi-gustavo/devops/.github/workflows/ci-shell.yml@v0.1.0
     with:
       command: |
         for f in $(git ls-files '*.sh'); do bash -n "$f"; done

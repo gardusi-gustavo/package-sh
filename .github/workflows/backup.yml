@@ -11,7 +11,7 @@ permissions:
 
 jobs:
   backup:
-    uses: gardusi-gustavo/devops/.github/workflows/backup.yml@main
+    uses: gardusi-gustavo/devops/.github/workflows/backup.yml@v0.1.0
     with:
       repository: gardusi-gustavo/package-sh
       retention: 3
