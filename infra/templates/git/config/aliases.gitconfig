@@ -1,0 +1,6 @@
+[alias]
+	st = status -sb
+	co = checkout
+	br = branch
+	lg = log --oneline --graph --decorate
+	unstage = reset HEAD --

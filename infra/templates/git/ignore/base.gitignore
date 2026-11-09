@@ -1,0 +1,14 @@
+# OS / editor
+.DS_Store
+Thumbs.db
+*.log
+*.swp
+.vscode/
+.idea/
+.devcontainer/
+public/
+
+# Generated template runtime
+.githooks/
+bin/
+infra/scripts/
