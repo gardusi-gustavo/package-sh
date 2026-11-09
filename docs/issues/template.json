@@ -9,7 +9,10 @@
   "spec": {
     "summary": "What this task changes.",
     "expected_outcome": "What must be true after the change.",
-    "acceptance_criteria": ["Observable result one", "Observable result two"]
+    "acceptance_criteria": [
+      "Observable result one",
+      "Observable result two"
+    ]
   },
   "attempts": []
 }
