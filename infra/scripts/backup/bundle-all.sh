@@ -84,14 +84,16 @@ run_one() {
   fi
 }
 
-while IFS= read -r repo; do
-  [[ -n "$repo" ]] || continue
-  if (( ${#ONLY[@]} > 0 )); then
-    skip=1
-    for only in "${ONLY[@]}"; do [[ "$repo" == "$only" ]] && skip=0; done
-    (( skip )) && continue
-  fi
-  run_one "$repo"
-done < <(jq -r '.tiers[].repos[]' "$ORDER")
+if (( ${#ONLY[@]} > 0 )); then
+  for repo in "${ONLY[@]}"; do
+    [[ -n "$repo" ]] || continue
+    run_one "$repo"
+  done
+else
+  while IFS= read -r repo; do
+    [[ -n "$repo" ]] || continue
+    run_one "$repo"
+  done < <(jq -r '.tiers[].repos[]' "$ORDER")
+fi
 
 echo "bundle order complete"

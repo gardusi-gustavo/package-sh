@@ -1,5 +1,5 @@
 {
-  "version": "0.7.0",
+  "version": "0.7.1",
   "scripts": {
     "agents.sync-agents": {
       "path": "infra/scripts/agents/sync-agents.sh",
@@ -227,7 +227,7 @@
     },
     "backup.bundle-backup": {
       "path": "infra/scripts/backup/bundle-backup.sh",
-      "sha256": "1ff321933d7fb716a99bf53d316f8d89de8c2ad334d07fa388c068ad429f3682"
+      "sha256": "1baa2af61de7acb0ac0573ea79341577702d7e95b403f5603fe25ab078cc4261"
     },
     "backup.bundle-manifest": {
       "path": "infra/scripts/backup/bundle-manifest.py",
@@ -243,7 +243,7 @@
     },
     "backup.bundle-all": {
       "path": "infra/scripts/backup/bundle-all.sh",
-      "sha256": "015a7a8718a3c5ba85fc977720a5f3782755d91f76b9e32e3d5a30ffe78b7afa"
+      "sha256": "85bd578d52f202fabd7e52558fc1085b9806b5510403360d413696b43772e333"
     }
   },
   "files": {

@@ -74,6 +74,7 @@ snapshot_tmp="$work/snapshot.bundle"
 git -C "$mirror_clone" bundle create "$snapshot_tmp" --branches --tags
 git -C "$mirror_clone" bundle verify "$snapshot_tmp" >/dev/null
 
+FINAL_PATH=""
 finalize() {
   local src="$1" dest="$2"
   mkdir -p "$(dirname "$dest")"
@@ -87,9 +88,11 @@ finalize() {
       --output "$plain" "$encrypted"
     git -C "$mirror_clone" bundle verify "$plain" >/dev/null
     rm -f "$plain"
+    FINAL_PATH="$encrypted"
   else
     mv "$src" "$dest"
     git -C "$mirror_clone" bundle verify "$dest" >/dev/null
+    FINAL_PATH="$dest"
   fi
 }
 
@@ -143,6 +146,6 @@ for mirror in "${MIRRORS[@]}"; do
   echo "mirrored: $mirror/$REPO"
 done
 
-echo "snapshot: $snapshot_dest"
+echo "snapshot: $FINAL_PATH"
 echo "snapshots kept: $(find "$SNAPSHOT_DIR" -maxdepth 1 -type f \( -name '*.bundle' -o -name '*.bundle.gpg' \) | wc -l | tr -d ' ')"
 echo "tags kept: $(find "$TAG_DIR" -maxdepth 1 -type f \( -name '*.bundle' -o -name '*.bundle.gpg' \) | wc -l | tr -d ' ')"
