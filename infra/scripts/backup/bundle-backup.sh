@@ -103,6 +103,7 @@ while [[ -e "$snapshot_dest" || -e "$snapshot_dest.gpg" ]]; do
   suffix=$((suffix + 1))
 done
 finalize "$snapshot_tmp" "$snapshot_dest"
+snapshot_final="$FINAL_PATH"
 head_after="$(git -C "$mirror_clone" rev-parse HEAD)"
 [[ "$head_before" == "$head_after" ]] || {
   echo "error: repository HEAD changed during bundle creation" >&2; exit 1; }
@@ -146,6 +147,6 @@ for mirror in "${MIRRORS[@]}"; do
   echo "mirrored: $mirror/$REPO"
 done
 
-echo "snapshot: $FINAL_PATH"
+echo "snapshot: $snapshot_final"
 echo "snapshots kept: $(find "$SNAPSHOT_DIR" -maxdepth 1 -type f \( -name '*.bundle' -o -name '*.bundle.gpg' \) | wc -l | tr -d ' ')"
 echo "tags kept: $(find "$TAG_DIR" -maxdepth 1 -type f \( -name '*.bundle' -o -name '*.bundle.gpg' \) | wc -l | tr -d ' ')"
