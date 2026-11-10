@@ -1,5 +1,5 @@
 {
-  "version": "0.7.5",
+  "version": "0.7.6",
   "scripts": {
     "agents.sync-agents": {
       "path": "infra/scripts/agents/sync-agents.sh",
@@ -252,6 +252,10 @@
     "backup.bundle-mirror": {
       "path": "infra/scripts/backup/bundle-mirror.sh",
       "sha256": "e782c50a33fe519be00b7a1c75ec37ec728380d7f9dce4baf5e5af515395fb90"
+    },
+    "governance.reconcile-gitea-github": {
+      "path": "infra/scripts/governance/reconcile-gitea-github.py",
+      "sha256": "95cf0eba64b181583e57c2dbafd4e65dec42440b1800ff768a5b7b8daa22c6f1"
     }
   },
   "files": {
