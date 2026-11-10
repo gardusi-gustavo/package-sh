@@ -1,5 +1,5 @@
 {
-  "version": "0.7.7",
+  "version": "0.7.8",
   "scripts": {
     "agents.sync-agents": {
       "path": "infra/scripts/agents/sync-agents.sh",
@@ -267,7 +267,7 @@
     },
     "governance.generate-progress": {
       "path": "infra/scripts/governance/generate-progress.py",
-      "sha256": "d801ef5078582f3584900652597c6a4dd84bc82dfd678be3b4d971e2404994f9"
+      "sha256": "be6cee8a46bc7b2f69bce29c1b3b40b994b60b03c50147835452734e42b71038"
     }
   },
   "files": {

@@ -185,6 +185,7 @@ def main() -> int:
                 "tags": item.get("tags", 0),
                 "total_bytes": item.get("total_bytes", 0),
                 "manifest": item.get("manifest"),
+                "retirement": item.get("retirement"),
             }
         )
 
@@ -211,6 +212,7 @@ def main() -> int:
             "soak_until": archive.get("soak_until"),
             "report": str(args.archive),
             "archived": sum(1 for row in rows if row["gitea_archived"]),
+            "total": len(archive.get("repositories", [])),
         },
         "reconciliation": {
             "generated_at": recon.get("generated_at"),
