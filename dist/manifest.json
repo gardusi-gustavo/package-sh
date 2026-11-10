@@ -1,5 +1,5 @@
 {
-  "version": "0.7.6",
+  "version": "0.7.7",
   "scripts": {
     "agents.sync-agents": {
       "path": "infra/scripts/agents/sync-agents.sh",
@@ -256,6 +256,18 @@
     "governance.reconcile-gitea-github": {
       "path": "infra/scripts/governance/reconcile-gitea-github.py",
       "sha256": "95cf0eba64b181583e57c2dbafd4e65dec42440b1800ff768a5b7b8daa22c6f1"
+    },
+    "governance.verify-gitea-archive": {
+      "path": "infra/scripts/governance/verify-gitea-archive.py",
+      "sha256": "e91fd38ff5804745097f2d93d0049cc0d0a3b6913edf67a3b470a38b33b2a908"
+    },
+    "governance.reconcile-github-bundles": {
+      "path": "infra/scripts/governance/reconcile-github-bundles.py",
+      "sha256": "3220fc3056ce84acaba04ec84a7283c848b0ce333ff86493c7c8cc7612e67728"
+    },
+    "governance.generate-progress": {
+      "path": "infra/scripts/governance/generate-progress.py",
+      "sha256": "d801ef5078582f3584900652597c6a4dd84bc82dfd678be3b4d971e2404994f9"
     }
   },
   "files": {
