@@ -10,7 +10,7 @@ permissions:
   contents: read
 
 jobs:
-  pr:
+  ci:
     if: github.event_name == 'pull_request'
     uses: gardusi-gustavo/.github/.github/workflows/event-ci.yml@release/v1
 
